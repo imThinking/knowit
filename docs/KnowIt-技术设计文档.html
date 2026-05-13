@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     KnowIt 技术设计文档
+     Kami 排版版本
+     ================================================================== -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>KnowIt 技术设计文档</title>
+<meta name="author" content="KnowIt Team">
+<meta name="description" content="KnowIt 个人知识库系统技术设计文档">
+<style>
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+  }
+
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+  }
+
+  @page {
+    size: A4;
+    margin: 20mm 22mm 22mm 22mm;
+    background: #f5f4ed;
+
+    @top-right {
+      content: string(section-title);
+      font-family: "TsangerJinKai02", serif;
+      font-size: 8pt;
+      color: #6b6a64;
+    }
+
+    @bottom-center {
+      content: counter(page) "  ·  KnowIt 技术设计文档";
+      font-family: "TsangerJinKai02", serif;
+      font-size: 9pt;
+      color: #6b6a64;
+    }
+  }
+
+  @page:first {
+    @top-right { content: ""; }
+    @bottom-center { content: ""; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5f4ed;
+    --ivory: #faf9f5;
+    --near-black: #141413;
+    --dark-warm: #3d3d3a;
+    --olive: #504e49;
+    --stone: #6b6a64;
+    --brand: #1B365D;
+    --border: #e8e6dc;
+    --border-soft: #e5e3d8;
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", serif;
+  }
+
+  html, body { background: var(--parchment); }
+
+  @media screen {
+    body { max-width: 210mm; margin: 0 auto; padding: 20mm 22mm 22mm 22mm; }
+  }
+
+  body {
+    color: var(--near-black);
+    font-family: var(--serif);
+    font-size: 10pt;
+    line-height: 1.55;
+  }
+
+  .cover {
+    min-height: 240mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40mm 0 0 0;
+    break-after: page;
+  }
+  .cover-eyebrow {
+    font-family: var(--serif);
+    font-size: 10pt;
+    color: var(--brand);
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    margin-bottom: 18pt;
+  }
+  .cover-title {
+    font-size: 36pt;
+    font-weight: 500;
+    line-height: 1.15;
+    margin-bottom: 16pt;
+  }
+  .cover-sub {
+    font-family: var(--serif);
+    font-size: 14pt;
+    color: var(--olive);
+    line-height: 1.5;
+    margin-bottom: 30pt;
+  }
+  .cover-meta {
+    font-family: var(--serif);
+    font-size: 10pt;
+    color: var(--stone);
+    line-height: 1.5;
+  }
+
+  .toc { break-after: page; }
+  .toc h2 {
+    font-size: 22pt;
+    font-weight: 500;
+    margin-bottom: 14pt;
+    border-left: 2.5pt solid var(--brand);
+    padding-left: 8pt;
+  }
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6pt 0;
+    border-bottom: 0.3pt dotted var(--border);
+    font-size: 11pt;
+  }
+  .toc-num { color: var(--brand); min-width: 30pt; }
+  .toc-title { flex: 1; padding-left: 6pt; }
+  .toc-page { color: var(--stone); }
+
+  h1 {
+    font-size: 22pt;
+    font-weight: 500;
+    margin: 0 0 10pt 0;
+    border-left: 2.5pt solid var(--brand);
+    padding-left: 8pt;
+    break-after: avoid;
+  }
+
+  h2 {
+    font-size: 16pt;
+    font-weight: 500;
+    margin: 24pt 0 6pt 0;
+    break-after: avoid;
+    string-set: section-title content();
+  }
+
+  h3 {
+    font-size: 13pt;
+    font-weight: 500;
+    margin: 18pt 0 4pt 0;
+    break-after: avoid;
+  }
+
+  .chapter-num {
+    font-size: 10pt;
+    color: var(--brand);
+    text-transform: uppercase;
+    margin-bottom: 6pt;
+  }
+
+  p { margin: 0 0 10pt 0; line-height: 1.55; }
+
+  .lead {
+    font-size: 12pt;
+    line-height: 1.55;
+    color: var(--dark-warm);
+    margin-bottom: 14pt;
+  }
+
+  .hl { color: var(--brand); font-weight: 500; }
+  strong { font-weight: 500; }
+
+  ul, ol {
+    margin: 6pt 0 10pt 0;
+    padding-left: 20pt;
+    line-height: 1.55;
+  }
+  ul li::marker { color: var(--brand); }
+
+  code {
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 9pt;
+    background: var(--ivory);
+    padding: 1pt 4pt;
+    border-radius: 2pt;
+  }
+
+  pre {
+    font-family: "JetBrains Mono", Consolas, monospace;
+    font-size: 8pt;
+    line-height: 1.4;
+    background: var(--ivory);
+    border: 0.5pt solid var(--border-soft);
+    padding: 10pt 14pt;
+    margin: 10pt 0;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    break-inside: avoid;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+  table th {
+    text-align: left;
+    font-weight: 500;
+    padding: 6pt 8pt;
+    border-bottom: 1pt solid var(--border);
+  }
+  table td {
+    padding: 5pt 8pt;
+    border-bottom: 0.3pt solid var(--border-soft);
+  }
+
+  .callout {
+    background: var(--ivory);
+    border-left: 2pt solid var(--brand);
+    padding: 10pt 14pt;
+    border-radius: 3pt;
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+
+  .info-box {
+    background: var(--ivory);
+    border: 0.5pt solid var(--border);
+    padding: 10pt 14pt;
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+  .info-box-title {
+    font-size: 9pt;
+    color: var(--brand);
+    font-weight: 500;
+    margin-bottom: 6pt;
+  }
+
+  .algorithm {
+    background: var(--ivory);
+    border: 0.5pt solid var(--border);
+    padding: 12pt 16pt;
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+
+  .chapter { break-before: page; }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ COVER ═════════════ -->
+<section class="cover">
+  <div>
+    <div class="cover-eyebrow">技术设计文档 · V1.0</div>
+    <div class="cover-title">KnowIt<br>技术架构与核心算法设计</div>
+    <div class="cover-sub">个人知识库收集整理工具箱的完整技术实现方案，涵盖系统架构、数据库设计、智能合并算法、相似度计算等核心模块。</div>
+  </div>
+  <div class="cover-meta">
+    <strong>KnowIt 开源团队</strong><br>
+    V1.0  ·  2026.05.12<br>
+    文档版本：1.0
+  </div>
+</section>
+
+<!-- ═════════════ 目录 ═════════════ -->
+<section class="toc">
+  <h2>目录</h2>
+  <div class="toc-item"><span class="toc-num">01</span><span class="toc-title">系统架构设计</span><span class="toc-page">03</span></div>
+  <div class="toc-item"><span class="toc-num">02</span><span class="toc-title">数据库设计</span><span class="toc-page">05</span></div>
+  <div class="toc-item"><span class="toc-num">03</span><span class="toc-title">智能合并算法</span><span class="toc-page">08</span></div>
+  <div class="toc-item"><span class="toc-num">04</span><span class="toc-title">相似度计算</span><span class="toc-page">12</span></div>
+  <div class="toc-item"><span class="toc-num">05</span><span class="toc-title">全文搜索设计</span><span class="toc-page">15</span></div>
+  <div class="toc-item"><span class="toc-num">06</span><span class="toc-title">CLI 接口设计</span><span class="toc-page">17</span></div>
+  <div class="toc-item"><span class="toc-num">07</span><span class="toc-title">PDF 导出设计</span><span class="toc-page">19</span></div>
+  <div class="toc-item"><span class="toc-num">08</span><span class="toc-num">09</span><span class="toc-title">API 接口设计</span><span class="toc-page">21</span></div>
+  <div class="toc-item"><span class="toc-num">10</span><span class="toc-title">性能优化策略</span><span class="toc-page">22</span></div>
+</section>
+
+<!-- ═════════════ Chapter 01：系统架构 ═════════════ -->
+<section>
+  <div class="chapter-num">01 · System Architecture</div>
+  <h1>系统架构设计</h1>
+
+  <p class="lead">KnowIt 采用<span class="hl">模块化分层架构</span>，分为接口层、业务逻辑层、数据访问层、存储层。</p>
+
+  <h2>整体架构图</h2>
+  <pre>
+┌─────────────────────────────────────────────────────────────┐
+│                        接口层 (Interface Layer)              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │   CLI 命令    │  │  REST API    │  │  Skill 插件   │      │
+│  │   Click      │  │   FastAPI    │  │  (可选)       │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                     业务逻辑层 (Service Layer)              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  收集服务    │  │  合并服务    │  │  搜索服务    │      │
+│  │  Collector   │  │  Merger      │  │  Search      │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  推荐服务    │  │  导出服务    │  │  标签服务    │      │
+│  │  Recommender │  │  Exporter    │  │  Tagger      │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    数据访问层 (Repository Layer)            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │  Item Repo   │  │ Collection   │  │   Tag Repo   │      │
+│  │              │  │   Repo       │  │              │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                      存储层 (Storage Layer)                 │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
+│  │   SQLite     │  │ Meilisearch  │  │  File System │      │
+│  │  (元数据)    │  │  (全文索引)  │  │  (原始内容)   │      │
+│  └──────────────┘  └──────────────┘  └──────────────┘      │
+│                                                               │
+│  ┌─────────────────────────────────────────────────────┐    │
+│  │          clip-to-kami (内容转换引擎)                  │    │
+│  │  • 网页抓取  • 微信文章  • EPUB  • Kami 排版         │    │
+│  └─────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────────────────────────────┘
+  </pre>
+
+  <h2>模块依赖关系</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>模块</th>
+        <th>依赖</th>
+        <th>被依赖</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>CLI</strong></td>
+        <td>Click, Service Layer</td>
+        <td>-</td>
+      </tr>
+      <tr>
+        <td><strong>Service Layer</strong></td>
+        <td>Repository Layer, clip-to-kami</td>
+        <td>CLI, API</td>
+      </tr>
+      <tr>
+        <td><strong>Repository Layer</strong></td>
+        <td>SQLite, Meilisearch</td>
+        <td>Service Layer</td>
+      </tr>
+      <tr>
+        <td><strong>clip-to-kami</strong></td>
+        <td>Playwright, WeasyPrint</td>
+        <td>Service Layer</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>技术栈清单</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>类别</th>
+        <th>技术</th>
+        <th>版本</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>语言</strong></td>
+        <td>Python</td>
+        <td>≥ 3.10</td>
+      </tr>
+      <tr>
+        <td><strong>CLI 框架</strong></td>
+        <td>Click</td>
+        <td>≥ 8.0</td>
+      </tr>
+      <tr>
+        <td><strong>Web 框架</strong></td>
+        <td>FastAPI</td>
+        <td>≥ 0.100</td>
+      </tr>
+      <tr>
+        <td><strong>数据库</strong></td>
+        <td>SQLite</td>
+        <td>≥ 3.35</td>
+      </tr>
+      <tr>
+        <td><strong>搜索引擎</strong></td>
+        <td>Meilisearch</td>
+        <td>≥ 1.0</td>
+      </tr>
+      <tr>
+        <td><strong>ORM</strong></td>
+        <td>SQLAlchemy</td>
+        <td>≥ 2.0</td>
+      </tr>
+      <tr>
+        <td><strong>相似度计算</strong></td>
+        <td>simhash</td>
+        <td>≥ 2.0</td>
+      </tr>
+      <tr>
+        <td><strong>文本处理</strong></td>
+        <td>BeautifulSoup4, jieba</td>
+        <td>≥ 4.12, ≥ 0.42</td>
+      </tr>
+      <tr>
+        <td><strong>PDF 生成</strong></td>
+        <td>WeasyPrint</td>
+        <td>≥ 61.0</td>
+      </tr>
+      <tr>
+        <td><strong>测试框架</strong></td>
+        <td>pytest</td>
+        <td>≥ 7.0</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═════════════ Chapter 02：数据库设计 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">02 · Database Design</div>
+  <h1>数据库设计</h1>
+
+  <p class="lead">采用 <span class="hl">SQLite + Meilisearch</span> 双存储架构：SQLite 存储元数据，Meilisearch 提供全文搜索和相似度查询。</p>
+
+  <h2>数据表设计</h2>
+
+  <h3>items（知识条目表）</h3>
+  <pre>
+CREATE TABLE items (
+    id TEXT PRIMARY KEY,                    -- 唯一标识（时间戳 + UUID）
+    title TEXT NOT NULL,                    -- 标题
+    source_type TEXT NOT NULL,              -- 来源类型: 'webpage', 'wechat', 'local', 'manual'
+    source_url TEXT,                        -- 原始 URL
+    author TEXT,                            -- 作者
+    content_html TEXT,                      -- HTML 格式内容
+    content_markdown TEXT,                  -- Markdown 格式内容
+    content_text TEXT,                      -- 纯文本（用于相似度计算）
+    word_count INTEGER,                     -- 字数统计
+    reading_time INTEGER,                   -- 阅读时长（分钟）
+    collection_id TEXT,                     -- 所属合集
+    status TEXT DEFAULT 'inbox',            -- 状态: 'inbox', 'archived', 'starred', 'merged'
+    merged_into TEXT,                       -- 合并到的条目 ID（如果被合并）
+    simhash TEXT,                           -- SimHash 指纹（64位十六进制）
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (collection_id) REFERENCES collections(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_items_status ON items(status);
+CREATE INDEX idx_items_created ON items(created_at DESC);
+CREATE INDEX idx_items_simhash ON items(simhash);
+CREATE INDEX idx_items_collection ON items(collection_id);
+  </pre>
+
+  <h3>item_similarities（相似度缓存表）</h3>
+  <pre>
+CREATE TABLE item_similarities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    item_id_1 TEXT NOT NULL,                -- 条目 1
+    item_id_2 TEXT NOT NULL,                -- 条目 2
+    similarity REAL NOT NULL,               -- 相似度 [0.0, 1.0]
+    method TEXT NOT NULL,                   -- 计算方法: 'simhash', 'embedding'
+    computed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (item_id_1) REFERENCES items(id) ON DELETE CASCADE,
+    FOREIGN KEY (item_id_2) REFERENCES items(id) ON DELETE CASCADE,
+    UNIQUE(item_id_1, item_id_2, method)
+);
+
+CREATE INDEX idx_similarities_item1 ON item_similarities(item_id_1, similarity DESC);
+CREATE INDEX idx_similarities_item2 ON item_similarities(item_id_2, similarity DESC);
+CREATE INDEX idx_similarities_threshold ON item_similarities(similarity DESC);
+  </pre>
+
+  <h3>collections（合集表）</h3>
+  <pre>
+CREATE TABLE collections (
+    id TEXT PRIMARY KEY,                    -- 唯一标识
+    name TEXT NOT NULL UNIQUE,              -- 合集名称
+    description TEXT,                       -- 描述
+    parent_id TEXT,                         -- 父合集（支持嵌套）
+    item_count INTEGER DEFAULT 0,           -- 条目数量
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (parent_id) REFERENCES collections(id) ON DELETE SET NULL
+);
+
+CREATE INDEX idx_collections_parent ON collections(parent_id);
+  </pre>
+
+  <h3>tags（标签表）</h3>
+  <pre>
+CREATE TABLE tags (
+    id TEXT PRIMARY KEY,
+    name TEXT UNIQUE NOT NULL,              -- 标签名称
+    color TEXT DEFAULT '#1B365D',           -- 显示颜色
+    use_count INTEGER DEFAULT 0,            -- 使用次数
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+  </pre>
+
+  <h3>item_tags（条目标签关联表）</h3>
+  <pre>
+CREATE TABLE item_tags (
+    item_id TEXT NOT NULL,
+    tag_id TEXT NOT NULL,
+    PRIMARY KEY (item_id, tag_id),
+    FOREIGN KEY (item_id) REFERENCES items(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_item_tags_tag ON item_tags(tag_id);
+  </pre>
+
+  <h3>merge_history（合并历史表）</h3>
+  <pre>
+CREATE TABLE merge_history (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    target_item_id TEXT NOT NULL,           -- 合并后的条目 ID
+    source_item_ids TEXT NOT NULL,         -- 被合并的条目 ID 列表（JSON 数组）
+    merge_strategy TEXT NOT NULL,          -- 合并策略: 'auto', 'manual'
+    merged_content_html TEXT,              -- 合并后的内容
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (target_item_id) REFERENCES items(id) ON DELETE CASCADE
+);
+  </pre>
+
+  <h2>Meilisearch 索引设计</h2>
+  <div class="info-box">
+    <div class="info-box-title">索引配置</div>
+    <pre>
+{
+  "uid": "items",
+  "primaryKey": "id",
+  "searchableAttributes": [
+    "title",
+    "content_text",
+    "author"
+  ],
+  "filterableAttributes": [
+    "status",
+    "source_type",
+    "collection_id",
+    "created_at"
+  ],
+  "sortableAttributes": [
+    "created_at",
+    "word_count",
+    "reading_time"
+  ],
+  "rankingRules": [
+    "words",
+    "typo",
+    "proximity",
+    "attribute",
+    "sort",
+    "exactness"
+  ],
+  "stopWords": [
+    "的", "了", "在", "是", "我", "有", "和", "就", "不", "人"
+  ]
+}
+    </pre>
+  </div>
+</section>
+
+<!-- ═════════════ Chapter 03：智能合并算法 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">03 · Merge Algorithm</div>
+  <h1>智能合并算法</h1>
+
+  <p class="lead">KnowIt 的核心是<span class="hl">智能合并重复和相似内容</span>，而非简单删除。算法分为三个阶段：检测、匹配、合并。</p>
+
+  <h2>算法流程概览</h2>
+  <pre>
+┌─────────────────────────────────────────────────────────────┐
+│  输入：新内容（title + content_text）                       │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  阶段 1：快速检测（Fast Detection）                         │
+│  • URL 去重（完全相同）                                      │
+│  • 标题相似度（Levenshtein 距离 > 0.9）                     │
+│  • SimHash 指纹（汉明距离 ≤ 3）                             │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  阶段 2：相似度匹配（Similarity Matching）                   │
+│  • 对候选集进行内容相似度计算                                │
+│  • 使用 SimHash 或 Sentence-BERT                             │
+│  • 返回相似度 > 阈值（默认 0.75）的条目                      │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  阶段 3：智能合并（Smart Merge）                             │
+│  • 提取各篇内容的要点（句子分割）                            │
+│  • 去重相似句子（cosine similarity > 0.85）                 │
+│  • 按主题聚类（K-means, k=3~5）                              │
+│  • 生成合并后的内容（保留所有独特要点）                      │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  输出：合并预览 + 用户确认                                   │
+│  • 显示原始内容列表                                          │
+│  • 显示合并后的内容                                          │
+│  • 用户确认后执行合并                                        │
+└─────────────────────────────────────────────────────────────┘
+  </pre>
+
+  <h2>阶段 1：快速检测（Fast Detection）</h2>
+  <div class="algorithm">
+    <h4>1.1 URL 去重</h4>
+    <pre>
+def detect_duplicate_url(new_item: Item, existing: List[Item]) -> Optional[Item]:
+    """检测 URL 完全相同的条目"""
+    if not new_item.source_url:
+        return None
+
+    for item in existing:
+        if item.source_url == new_item.source_url:
+            return item
+    return None
+    </pre>
+
+    <h4>1.2 标题相似度检测</h4>
+    <pre>
+import Levenshtein
+
+def detect_similar_title(new_item: Item, existing: List[Item]) -> List[Tuple[Item, float]]:
+    """检测标题相似度（Levenshtein 距离）"""
+    similar = []
+    for item in existing:
+        distance = Levenshtein.distance(new_item.title, item.title)
+        max_len = max(len(new_item.title), len(item.title))
+        similarity = 1 - (distance / max_len) if max_len > 0 else 0
+        if similarity >= 0.9:  # 阈值可配置
+            similar.append((item, similarity))
+    return sorted(similar, key=lambda x: x[1], reverse=True)
+    </pre>
+
+    <h4>1.3 SimHash 指纹检测</h4>
+    <pre>
+from simhash import Simhash
+
+def compute_simhash(text: str) -> str:
+    """计算 SimHash 指纹（64位）"""
+    return Simhash(text).value
+
+def detect_near_duplicate(new_item: Item, existing: List[Item]) -> List[Tuple[Item, int]]:
+    """检测近重复（汉明距离 ≤ 3）"""
+    new_hash = Simhash(new_item.content_text)
+    similar = []
+
+    for item in existing:
+        if not item.simhash:
+            continue
+        item_hash = Simhash(int(item.simhash, 16))
+        distance = new_hash.distance(item_hash)
+        if distance <= 3:  # 汉明距离阈值
+            similar.append((item, distance))
+
+    return sorted(similar, key=lambda x: x[1])
+    </pre>
+  </div>
+
+  <h2>阶段 2：相似度匹配（Similarity Matching）</h2>
+  <div class="algorithm">
+    <h4>2.1 内容相似度计算（SimHash）</h4>
+    <pre>
+def calculate_content_similarity(text1: str, text2: str) -> float:
+    """计算内容相似度 [0.0, 1.0]"""
+    hash1 = Simhash(text1)
+    hash2 = Simhash(text2)
+
+    # 汉明距离转相似度
+    distance = hash1.distance(hash2)
+    max_distance = 64  # SimHash 默认 64 位
+    similarity = 1 - (distance / max_distance)
+
+    return similarity
+    </pre>
+
+    <h4>2.2 候选集过滤</h4>
+    <pre>
+def find_similar_candidates(
+    new_item: Item,
+    existing: List[Item],
+    threshold: float = 0.75
+) -> List[Tuple[Item, float]]:
+    """找到所有相似的条目（相似度 > threshold）"""
+    candidates = []
+
+    for item in existing:
+        # 多策略计算相似度
+        sim = calculate_content_similarity(new_item.content_text, item.content_text)
+
+        if sim >= threshold:
+            candidates.append((item, sim))
+
+    # 按相似度排序
+    return sorted(candidates, key=lambda x: x[1], reverse=True)
+    </pre>
+  </div>
+
+  <h2>阶段 3：智能合并（Smart Merge）</h2>
+  <div class="algorithm">
+    <h4>3.1 要点提取（Sentence Segmentation）</h4>
+    <pre>
+import re
+
+def extract_sentences(text: str) -> List[str]:
+    """提取句子（中文 + 英文）"""
+    # 移除多余空白
+    text = re.sub(r'\s+', ' ', text.strip())
+
+    # 分句（句号、问号、感叹号）
+    sentences = re.split(r'[。！？.!?]+', text)
+
+    # 过滤空句子和短句（< 10 字符）
+    return [s.strip() for s in sentences if len(s.strip()) >= 10]
+    </pre>
+
+    <h4>3.2 句子去重（Sentence Deduplication）</h4>
+    <pre>
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+def deduplicate_sentences(sentences: List[str], threshold: float = 0.85) -> List[str]:
+    """去重相似句子"""
+    if len(sentences) <= 1:
+        return sentences
+
+    # 计算 TF-IDF 向量
+    vectorizer = TfidfVectorizer(tokenizer=jieba_tokenizer)
+    tfidf_matrix = vectorizer.fit_transform(sentences)
+
+    # 计算余弦相似度矩阵
+    similarity_matrix = cosine_similarity(tfidf_matrix)
+
+    # 去重：保留第一个，删除相似的
+    unique = []
+    removed = set()
+
+    for i in range(len(sentences)):
+        if i in removed:
+            continue
+
+        unique.append(sentences[i])
+
+        # 标记相似的句子
+        for j in range(i + 1, len(sentences)):
+            if similarity_matrix[i][j] >= threshold:
+                removed.add(j)
+
+    return unique
+
+def jieba_tokenizer(text):
+    """jieba 分词器"""
+    import jieba
+    return jieba.lcut(text)
+    </pre>
+
+    <h4>3.3 内容聚类（Content Clustering）</h4>
+    <pre>
+from sklearn.cluster import KMeans
+
+def cluster_sentences(sentences: List[str], n_clusters: int = 5) -> Dict[int, List[str]]:
+    """将句子按主题聚类"""
+    if len(sentences) <= n_clusters:
+        n_clusters = len(sentences)
+
+    # TF-IDF 向量化
+    vectorizer = TfidfVectorizer(tokenizer=jieba_tokenizer)
+    tfidf_matrix = vectorizer.fit_transform(sentences)
+
+    # K-means 聚类
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42)
+    clusters = kmeans.fit_predict(tfidf_matrix)
+
+    # 整理结果
+    result = {i: [] for i in range(n_clusters)}
+    for sentence, cluster_id in zip(sentences, clusters):
+        result[cluster_id].append(sentence)
+
+    return result
+    </pre>
+
+    <h4>3.4 生成合并内容（Generate Merged Content）</h4>
+    <pre>
+def merge_items(items: List[Item], strategy: str = 'auto') -> str:
+    """合并多个条目为一个"""
+    # 1. 提取所有句子
+    all_sentences = []
+    for item in items:
+        sentences = extract_sentences(item.content_text)
+        all_sentences.extend(sentences)
+
+    # 2. 去重相似句子
+    unique_sentences = deduplicate_sentences(all_sentences)
+
+    # 3. 按主题聚类
+    clusters = cluster_sentences(unique_sentences, n_clusters=min(5, len(unique_sentences)))
+
+    # 4. 生成合并内容（按聚类排序）
+    merged_sections = []
+    for cluster_id in sorted(clusters.keys()):
+        sentences = clusters[cluster_id]
+        if sentences:
+            section = '。'.join(sentences) + '。'
+            merged_sections.append(section)
+
+    merged_content = '\n\n'.join(merged_sections)
+
+    # 5. 生成元数据
+    titles = [item.title for item in items]
+    merged_title = f"【合并】{titles[0]}" if len(titles) == 1 else f"【合并】{len(titles)} 篇内容"
+
+    return merged_title, merged_content
+    </pre>
+  </div>
+
+  <h2>用户确认流程</h2>
+  <pre>
+def confirm_merge(items: List[Item]) -> bool:
+    """显示合并预览，等待用户确认"""
+    print(f"\n发现 {len(items)} 篇相似内容：")
+    for i, item in enumerate(items, 1):
+        print(f"  {i}. {item.title} (相似度: {item.similarity:.2f})")
+
+    # 计算合并预览
+    merged_title, merged_content = merge_items(items)
+
+    print(f"\n合并后的标题：{merged_title}")
+    print(f"合并后的内容（前 200 字）：\n{merged_content[:200]}...")
+
+    while True:
+        choice = input("\n是否合并？[Y/n] ").strip().lower()
+        if choice in ('', 'y', 'yes'):
+            return True
+        elif choice in ('n', 'no'):
+            return False
+        else:
+            print("请输入 Y 或 n")
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 04：相似度计算 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">04 · Similarity</div>
+  <h1>相似度计算</h1>
+
+  <p class="lead">KnowIt 使用<span class="hl">多级相似度计算策略</span>，在速度和准确度之间取得平衡。</p>
+
+  <h2>相似度计算策略</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>策略</th>
+        <th>算法</th>
+        <th>复杂度</th>
+        <th>适用场景</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>快速检测</strong></td>
+        <td>SimHash（汉明距离）</td>
+        <td>O(1)</td>
+        <td>初步过滤</td>
+      </tr>
+      <tr>
+        <td><strong>中度精确</strong></td>
+        <td>TF-IDF + 余弦相似度</td>
+        <td>O(n²)</td>
+        <td>句子去重</td>
+      </tr>
+      <tr>
+        <td><strong>高精度</strong></td>
+        <td>Sentence-BERT Embedding</td>
+        <td>O(n²)</td>
+        <td>语义相似（可选）</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>SimHash 实现细节</h2>
+  <div class="info-box">
+    <div class="info-box-title">SimHash 算法原理</div>
+    <ol>
+      <li>分词（jieba）</li>
+      <li>计算每个词的权重（TF-IDF）</li>
+      <li>生成每个词的哈希值（64位）</li>
+      <li>加权累加（+weight 或 -weight）</li>
+      <li>降维（>0 → 1, <0 → 0）</li>
+      <li>得到 64 位指纹</li>
+    </ol>
+  </div>
+
+  <pre>
+from simhash import Simhash
+
+def compute_content_fingerprint(content: str) -> str:
+    """计算内容指纹（64位十六进制）"""
+    # 预处理：移除 HTML 标签
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(content, 'html.parser')
+    text = soup.get_text(separator=' ', strip=True)
+
+    # 计算 SimHash
+    hash_value = Simhash(text)
+    return f"{hash_value.value:016x}"
+
+def are_near_duplicate(hash1: str, hash2: str, threshold: int = 3) -> bool:
+    """判断是否为近重复（汉明距离 ≤ threshold）"""
+    h1 = Simhash(int(hash1, 16))
+    h2 = Simhash(int(hash2, 16))
+    return h1.distance(h2) <= threshold
+  </pre>
+
+  <h2>相似度缓存策略</h2>
+  <div class="callout">
+    <strong>优化思路</strong>：避免每次都重新计算相似度。<br><br>
+    • 条目创建时计算 SimHash 并存储<br>
+    • 相似度计算结果存入 <code>item_similarities</code> 表<br>
+    • 定期清理过期缓存（> 30 天）<br>
+    • 条目更新时失效相关缓存
+  </div>
+
+  <pre>
+def get_similar_items(item_id: str, threshold: float = 0.75) -> List[Tuple[str, float]]:
+    """从缓存获取相似条目（miss 时重新计算）"""
+    # 1. 尝试从缓存读取
+    cached = db.execute("""
+        SELECT item_id_2, similarity
+        FROM item_similarities
+        WHERE item_id_1 = ? AND similarity >= ? AND method = 'simhash'
+        ORDER BY similarity DESC
+        LIMIT 10
+    """, (item_id, threshold)).fetchall()
+
+    if cached:
+        return [(row[0], row[1]) for row in cached]
+
+    # 2. 缓存 miss，重新计算
+    item = db.get_item(item_id)
+    all_items = db.get_all_items()
+
+    similar = []
+    for other in all_items:
+        if other.id == item_id:
+            continue
+
+        sim = calculate_content_similarity(item.content_text, other.content_text)
+        if sim >= threshold:
+            similar.append((other.id, sim))
+
+            # 写入缓存
+            db.execute("""
+                INSERT OR REPLACE INTO item_similarities
+                (item_id_1, item_id_2, similarity, method)
+                VALUES (?, ?, ?, 'simhash')
+            """, (item_id, other.id, sim))
+
+    return sorted(similar, key=lambda x: x[1], reverse=True)
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 05：全文搜索设计 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">05 · Search</div>
+  <h1>全文搜索设计</h1>
+
+  <p class="lead">使用 <span class="hl">Meilisearch</span> 作为全文搜索引擎，提供毫秒级搜索响应和中文支持。</p>
+
+  <h2>Meilisearch 集成</h2>
+  <pre>
+from meilisearch import Client
+
+class SearchService:
+    def __init__(self, host: str = "http://localhost:7700"):
+        self.client = Client(host)
+        self.index = self.client.index("items")
+
+    def index_item(self, item: Item):
+        """索引单个条目"""
+        document = {
+            "id": item.id,
+            "title": item.title,
+            "content_text": item.content_text,
+            "author": item.author or "",
+            "source_type": item.source_type,
+            "collection_id": item.collection_id or "",
+            "created_at": item.created_at.isoformat(),
+            "word_count": item.word_count or 0,
+        }
+        self.index.add_documents([document])
+
+    def search(self, query: str, limit: int = 20, filters: dict = None) -> List[dict]:
+        """全文搜索"""
+        search_params = {
+            "limit": limit,
+            "attributesToHighlight": ["title", "content_text"],
+        }
+
+        if filters:
+            search_params["filter"] = self._build_filters(filters)
+
+        results = self.index.search(query, search_params)
+        return results["hits"]
+
+    def _build_filters(self, filters: dict) -> str:
+        """构建 Meilisearch 过滤表达式"""
+        parts = []
+        for key, value in filters.items():
+            if isinstance(value, list):
+                parts.append(f"{key} IN {value}")
+            else:
+                parts.append(f"{key} = {value}")
+        return " AND ".join(parts) if parts else ""
+  </pre>
+
+  <h2>搜索接口设计</h2>
+  <pre>
+@app.post("/api/search")
+async def search_items(query: SearchQuery):
+    """搜索 API"""
+    service = SearchService()
+
+    # 构建过滤条件
+    filters = {}
+    if query.status:
+        filters["status"] = query.status
+    if query.source_type:
+        filters["source_type"] = query.source_type
+    if query.collection_id:
+        filters["collection_id"] = query.collection_id
+
+    # 执行搜索
+    results = service.search(
+        query=query.q,
+        limit=query.limit or 20,
+        filters=filters if filters else None
+    )
+
+    # 补充相似内容推荐
+    for item in results:
+        similar = get_similar_items(item["id"], threshold=0.7, limit=3)
+        item["similar"] = [
+            {"id": s[0], "similarity": s[1]} for s in similar
+        ]
+
+    return {"results": results, "total": len(results)}
+  </pre>
+
+  <h2>相似推荐集成</h2>
+  <pre>
+@app.get("/api/items/{item_id}/similar")
+async def get_similar(item_id: str, limit: int = 5):
+    """获取相似内容推荐"""
+    similar = get_similar_items(item_id, threshold=0.7, limit=limit)
+
+    # 补充元数据
+    results = []
+    for item_id, similarity in similar:
+        item = db.get_item(item_id)
+        results.append({
+            "id": item.id,
+            "title": item.title,
+            "similarity": similarity,
+            "snippet": item.content_text[:200] + "...",
+        })
+
+    return {"results": results}
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 06：CLI 接口设计 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">06 · CLI</div>
+  <h1>CLI 接口设计</h1>
+
+  <p class="lead">使用 <span class="hl">Click</span> 框架构建简洁的命令行接口。</p>
+
+  <h2>命令结构</h2>
+  <pre>
+kv
+├── add          # 添加内容
+│   ├── <url>    # 从 URL
+│   ├── --file   # 从文件
+│   └── --content # 直接输入
+├── merge        # 合并内容
+│   ├── --similar   # 合并相似内容
+│   └── --duplicate # 合并重复内容
+├── search       # 搜索
+│   ├── <query>     # 搜索关键词
+│   ├── --tag       # 按标签过滤
+│   └── --collection # 按合集过滤
+├── recommend    # 推荐相似内容
+│   └── <item_id>  # 条目 ID
+├── export       # 导出
+│   ├── <collection> # 合集名称
+│   └── --pdf        # 导出为 PDF
+└── collection   # 合集管理
+    ├── create    # 创建合集
+    ├── list      # 列出合集
+    └── delete    # 删除合集
+  </pre>
+
+  <h2>命令实现示例</h2>
+  <pre>
+import click
+
+@click.group()
+def cli():
+    """KnowIt - 你的第二大脑"""
+    pass
+
+@cli.command()
+@click.argument('url')
+def add(url):
+    """添加网页到知识库"""
+    vault = VaultService()
+
+    # 检测相似内容
+    item = vault.collect_from_url(url)
+    similar = vault.find_similar(item, threshold=0.75)
+
+    if similar:
+        click.echo(f"\n发现 {len(similar)} 篇相似内容：")
+        for s in similar:
+            click.echo(f"  • {s.title} (相似度: {s.similarity:.2f})")
+
+        if click.confirm("\n是否合并？"):
+            merged = vault.merge_items([item] + similar)
+            click.echo(f"✓ 已合并，ID: {merged.id}")
+        else:
+            new_item = vault.add_item(item)
+            click.echo(f"✓ 已添加，ID: {new_item.id}")
+    else:
+        new_item = vault.add_item(item)
+        click.echo(f"✓ 已添加，ID: {new_item.id}")
+
+@cli.command()
+@click.option('--threshold', default=0.75, help='相似度阈值')
+@click.option('--auto', is_flag=True, help='自动合并无需确认')
+def merge_similar(threshold, auto):
+    """合并所有相似内容"""
+    vault = VaultService()
+
+    # 获取所有待合并的组
+    groups = vault.find_all_similar_groups(threshold=threshold)
+
+    click.echo(f"发现 {len(groups)} 组相似内容")
+
+    for i, group in enumerate(groups, 1):
+        click.echo(f"\n组 {i}: {len(group)} 篇内容")
+        for item in group:
+            click.echo(f"  • {item.title}")
+
+        if auto or click.confirm(f"\n是否合并组 {i}？"):
+            merged = vault.merge_items(group)
+            click.echo(f"✓ 已合并，ID: {merged.id}")
+
+if __name__ == '__main__':
+    cli()
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 07：PDF 导出设计 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">07 · Export</div>
+  <h1>PDF 导出设计</h1>
+
+  <p class="lead">深度集成 <span class="hl">Kami 排版系统</span>，使用 clip-to-kami 生成专业 PDF。</p>
+
+  <h2>导出流程</h2>
+  <pre>
+┌─────────────────────────────────────────────────────────────┐
+│  1. 获取合集条目列表                                        │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  2. 提取内容（HTML）                                         │
+│  • 合并多个条目的 content_html                               │
+│  • 保留标题层级结构                                          │
+│  • 移除重复内容                                             │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  3. 应用 Kami 模板                                          │
+│  • 填充标题、作者、日期等元数据                             │
+│  • 生成目录（可选）                                          │
+│  • 应用 Kami CSS 样式                                        │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  4. 调用 WeasyPrint 生成 PDF                                 │
+│  • HTML → PDF                                               │
+│  • A4 页面，自动分页                                         │
+│  • 页眉页脚（章节名 + 页码）                                 │
+└────────────────────────┬────────────────────────────────────┘
+                         ↓
+┌─────────────────────────────────────────────────────────────┐
+│  5. 输出 PDF 文件                                            │
+└─────────────────────────────────────────────────────────────┘
+  </pre>
+
+  <h2>导出接口实现</h2>
+  <pre>
+from clip_to_kami.scripts.convert import generate_pdf, fill_kami_template
+
+def export_collection_pdf(collection_id: str, output_path: str):
+    """导出合集为 Kami PDF"""
+    # 1. 获取合集条目
+    items = db.get_items_in_collection(collection_id)
+
+    # 2. 合并内容
+    merged_content = merge_items_content(items)
+
+    # 3. 填充 Kami 模板
+    collection = db.get_collection(collection_id)
+    html = fill_kami_template(
+        body_content=merged_content,
+        title=collection.name,
+        author="KnowIt",
+        date=datetime.now().strftime("%Y-%m-%d"),
+        source=f"合集：{collection.name}"
+    )
+
+    # 4. 生成 PDF
+    generate_pdf(html, output_path)
+
+    return output_path
+
+def merge_items_content(items: List[Item]) -> str:
+    """合并多个条目为 HTML"""
+    parts = []
+
+    for item in items:
+        # 提取正文（移除元数据）
+        soup = BeautifulSoup(item.content_html, 'html.parser')
+
+        # 生成章节标题
+        section_html = f"""
+        <section>
+          <h1>{item.title}</h1>
+          <p class="meta">来源：{item.source_type} · {item.created_at}</p>
+          {str(soup)}
+        </section>
+        """
+        parts.append(section_html)
+
+    return '\n\n'.join(parts)
+  </pre>
+
+  <h2>黑白打印版本</h2>
+  <pre>
+def export_collection_with_bw(collection_id: str, output_dir: str):
+    """导出合集（彩色 + 黑白双版本）"""
+    # 彩色版（羊皮纸）
+    kami_pdf = Path(output_dir) / f"{collection_id}-kami.pdf"
+    export_collection_pdf(collection_id, str(kami_pdf))
+
+    # 黑白版（纯白底色）
+    bw_pdf = Path(output_dir) / f"{collection_id}-bw.pdf"
+    # 在 fill_kami_template 后应用 BW 主题
+    html = get_collection_html(collection_id)
+    html_bw = apply_bw_theme(html)  # 替换颜色
+    generate_pdf(html_bw, str(bw_pdf))
+
+    return kami_pdf, bw_pdf
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 08：API 接口设计 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">08 · API</div>
+  <h1>API 接口设计</h1>
+
+  <p class="lead">提供 <span class="hl">RESTful API</span>，支持第三方工具集成。</p>
+
+  <h2>API 端点清单</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>方法</th>
+        <th>端点</th>
+        <th>说明</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>POST</td>
+        <td>/api/items</td>
+        <td>创建条目</td>
+      </tr>
+      <tr>
+        <td>GET</td>
+        <td>/api/items/{id}</td>
+        <td>获取条目详情</td>
+      </tr>
+      <tr>
+        <td>GET</td>
+        <td>/api/items</td>
+        <td>列出条目（分页）</td>
+      </tr>
+      <tr>
+        <td>PUT</td>
+        <td>/api/items/{id}</td>
+        <td>更新条目</td>
+      </tr>
+      <tr>
+        <td>DELETE</td>
+        <td>/api/items/{id}</td>
+        <td>删除条目</td>
+      </tr>
+      <tr>
+        <td>GET</td>
+        <td>/api/search</td>
+        <td>搜索条目</td>
+      </tr>
+      <tr>
+        <td>GET</td>
+        <td>/api/items/{id}/similar</td>
+        <td>获取相似内容</td>
+      </tr>
+      <tr>
+        <td>POST</td>
+        <td>/api/merge</td>
+        <td>合并条目</td>
+      </tr>
+      <tr>
+        <td>POST</td>
+        <td>/api/export/{collection_id}</td>
+        <td>导出合集为 PDF</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>API 实现</h2>
+  <pre>
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
+app = FastAPI(title="KnowIt API", version="1.0")
+
+class ItemCreate(BaseModel):
+    title: str
+    content: str
+    source_url: str = None
+    source_type: str = "manual"
+
+@app.post("/api/items", response_model=ItemResponse)
+async def create_item(item: ItemCreate):
+    """创建条目"""
+    vault = VaultService()
+
+    # 检测相似内容
+    similar = vault.find_similar_from_content(item.content)
+
+    # 如果发现高度相似内容（> 0.9），提示用户
+    if similar and similar[0].similarity > 0.9:
+        raise HTTPException(
+            status_code=409,
+            detail=f"发现相似内容：{similar[0].title} (相似度: {similar[0].similarity:.2f})"
+        )
+
+    # 创建条目
+    new_item = vault.create_item(
+        title=item.title,
+        content=item.content,
+        source_url=item.source_url,
+        source_type=item.source_type
+    )
+
+    # 异步索引
+    background_tasks.add_task(index_item, new_item.id)
+
+    return new_item
+
+@app.post("/api/merge", response_model=ItemResponse)
+async def merge_items_request(request: MergeRequest):
+    """合并条目"""
+    vault = VaultService()
+
+    # 获取条目
+    items = [vault.get_item(id) for id in request.item_ids]
+
+    # 执行合并
+    merged = vault.merge_items(items, strategy=request.strategy)
+
+    return merged
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 09：性能优化 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">09 · Performance</div>
+  <h1>性能优化策略</h1>
+
+  <p class="lead">在<span class="hl">10 万条目规模</span>下保持良好性能。</p>
+
+  <h2>性能目标</h2>
+  <ul>
+    <li><strong>搜索响应</strong>：< 100ms（10 万条目）</li>
+    <li><strong>相似度计算</strong>：< 500ms（单条目）</li>
+    <li><strong>合并操作</strong>：< 2s（3-5 篇内容）</li>
+    <li><strong>PDF 导出</strong>：< 5s（10 篇内容）</li>
+  </ul>
+
+  <h2>优化策略</h2>
+
+  <h3>1. SimHash 缓存</h3>
+  <pre>
+• 条目创建时计算 SimHash 并存储
+• 相似度查询时先查缓存
+• 定期清理过期缓存（> 30 天）
+  </pre>
+
+  <h3>2. 相似度计算批处理</h3>
+  <pre>
+• 使用向量化计算（NumPy）
+• 多进程并行计算（Process Pool）
+• 只计算近 30 天的条目（旧条目合并概率低）
+  </pre>
+
+  <h3>3. Meilisearch 索引优化</h3>
+  <pre>
+• 只索引必要字段（title, content_text）
+• 使用 stop words 减少索引大小
+• 定期重建索引（每周）
+  </pre>
+
+  <h3>4. 数据库查询优化</h3>
+  <pre>
+• 添加必要的索引（见数据库设计）
+• 使用预编译语句（SQLAlchemy）
+• 连接池管理（避免频繁连接）
+  </pre>
+
+  <h3>5. 懒加载策略</h3>
+  <pre>
+• 列表页只显示摘要（不加载完整 content）
+• 点击详情时再加载完整内容
+• 相似推荐异步加载
+  </pre>
+
+  <h2>性能监控</h2>
+  <pre>
+import time
+from functools import wraps
+
+def measure_time(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        elapsed = time.time() - start
+
+        # 记录慢查询
+        if elapsed > 1.0:
+            logger.warning(f"Slow query: {func.__name__} took {elapsed:.2f}s")
+
+        return result
+    return wrapper
+
+@measure_time
+def find_similar_items(item_id: str):
+    # ... implementation ...
+    pass
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 10：附录 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">10 · Appendix</div>
+  <h1>附录</h1>
+
+  <h2>目录结构</h2>
+  <pre>
+knowit/
+├── kv/                        # 核心包
+│   ├── __init__.py
+│   ├── cli.py                 # CLI 入口
+│   ├── config.py              # 配置管理
+│   ├── database.py            # 数据库操作
+│   ├── models.py              # 数据模型
+│   ├── services/              # 业务逻辑
+│   │   ├── vault.py           # 知识库服务
+│   │   ├── merge.py           # 合并服务
+│   │   ├── search.py          # 搜索服务
+│   │   └── export.py          # 导出服务
+│   ├── algorithms/            # 核心算法
+│   │   ├── simhash.py         # SimHash 实现
+│   │   ├── similarity.py      # 相似度计算
+│   │   └── merge.py           # 合并算法
+│   └── utils/                 # 工具函数
+│       ├── paths.py           # 路径处理
+│       └── text.py            # 文本处理
+├── clip_to_kami/              # clip-to-kami 子模块
+├── api/                       # FastAPI 服务（可选）
+│   ├── main.py
+│   └── routes/
+├── tests/
+│   ├── test_simhash.py
+│   ├── test_merge.py
+│   └── test_search.py
+├── config/
+│   └── config.yaml
+├── requirements.txt
+├── pyproject.toml
+└── README.md
+  </pre>
+
+  <h2>配置文件</h2>
+  <pre>
+# config/config.yaml
+vault:
+  path: "~/KnowIt"
+  auto_merge: false           # 是否自动合并
+  similarity_threshold: 0.75   # 相似度阈值
+
+merge:
+  strategy: "auto"             # auto, manual
+  sentence_threshold: 0.85     # 句子去重阈值
+  cluster_count: 5             # 聚类数量
+
+search:
+  engine: "meilisearch"
+  url: "http://localhost:7700"
+
+pdf:
+  engine: "weasyprint"
+  font_dir: null
+
+logging:
+  level: "INFO"
+  file: "logs/knowit.log"
+  </pre>
+
+  <h2>环境变量</h2>
+  <pre>
+KNOWIT_HOME=~/KnowIt
+KNOWIT_DB_PATH=~/KnowIt/data/vault.db
+KNOWIT_MEILISEARCH_URL=http://localhost:7700
+  </pre>
+
+  <div class="takeaway">
+    <p><strong>KnowIt 技术文档 V1.0</strong></p>
+    <p>本文档涵盖了 KnowIt 的核心技术和算法实现。如有疑问，请参考源码或联系开发团队。</p>
+  </div>
+</section>
+
+</body>
+</html>

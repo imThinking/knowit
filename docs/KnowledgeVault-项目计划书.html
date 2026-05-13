@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<!-- ==================================================================
+     KnowledgeVault 项目计划书 · Kami 排版
+     ================================================================== -->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>KnowledgeVault 项目计划书</title>
+<meta name="author" content="项目团队">
+<meta name="description" content="个人知识库收集整理工具箱完整计划">
+<style>
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("./assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: url("./assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  @page {
+    size: A4;
+    margin: 20mm 22mm 22mm 22mm;
+    background: #f5f4ed;
+
+    @top-right {
+      content: string(section-title);
+      font-family: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+      font-size: 8pt;
+      color: #6b6a64;
+    }
+
+    @bottom-center {
+      content: counter(page) "  ·  KnowledgeVault 项目计划书";
+      font-family: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", Georgia, serif;
+      font-size: 9pt;
+      color: #6b6a64;
+    }
+  }
+
+  @page:first {
+    @top-right { content: ""; }
+    @bottom-center { content: ""; }
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --parchment: #f5f4ed;
+    --ivory:     #faf9f5;
+    --near-black:#141413;
+    --dark-warm: #3d3d3a;
+    --olive:     #504e49;
+    --stone:     #6b6a64;
+    --brand:     #1B365D;
+    --border:    #e8e6dc;
+    --border-soft:#e5e3d8;
+    --tag-bg:    #E4ECF5;
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", "STSong", Georgia, serif;
+    --sans: var(--serif);
+  }
+
+  html, body { background: var(--parchment); }
+
+  @media screen {
+    body { max-width: 210mm; margin: 0 auto; padding: 20mm 22mm 22mm 22mm; }
+  }
+
+  body {
+    color: var(--near-black);
+    font-family: var(--serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    letter-spacing: 0.3pt;
+  }
+
+  .cover {
+    min-height: 240mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40mm 0 0 0;
+    break-after: page;
+  }
+  .cover-eyebrow {
+    font-family: var(--sans);
+    font-size: 10pt;
+    color: var(--brand);
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    margin-bottom: 18pt;
+  }
+  .cover-title {
+    font-size: 36pt;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1.15;
+    letter-spacing: 0.3pt;
+    margin-bottom: 16pt;
+  }
+  .cover-sub {
+    font-family: var(--sans);
+    font-size: 14pt;
+    color: var(--olive);
+    line-height: 1.5;
+    max-width: 85%;
+    margin-bottom: 30pt;
+  }
+  .cover-meta {
+    font-family: var(--sans);
+    font-size: 10pt;
+    color: var(--stone);
+    line-height: 1.5;
+  }
+  .cover-meta strong {
+    color: var(--dark-warm);
+    font-weight: 500;
+  }
+
+  .toc { break-after: page; }
+  .toc h2 {
+    font-size: 22pt;
+    font-weight: 500;
+    margin-bottom: 14pt;
+    border-left: 2.5pt solid var(--brand);
+    border-radius: 1.5pt;
+    padding-left: 8pt;
+  }
+  .toc-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6pt 0;
+    border-bottom: 0.3pt dotted var(--border);
+    font-size: 11pt;
+  }
+  .toc-num {
+    color: var(--brand);
+    font-weight: 500;
+    min-width: 30pt;
+  }
+  .toc-title {
+    flex: 1;
+    color: var(--near-black);
+    padding-left: 6pt;
+  }
+  .toc-page {
+    color: var(--stone);
+    font-variant-numeric: tabular-nums;
+  }
+
+  h1 {
+    font-size: 22pt;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0 0 10pt 0;
+    border-left: 2.5pt solid var(--brand);
+    border-radius: 1.5pt;
+    padding-left: 8pt;
+    color: var(--near-black);
+    break-after: avoid;
+  }
+
+  h2 {
+    font-size: 16pt;
+    font-weight: 500;
+    line-height: 1.25;
+    margin: 24pt 0 6pt 0;
+    color: var(--near-black);
+    break-after: avoid;
+    string-set: section-title content();
+  }
+
+  h3 {
+    font-size: 13pt;
+    font-weight: 500;
+    line-height: 1.3;
+    margin: 18pt 0 4pt 0;
+    color: var(--dark-warm);
+    break-after: avoid;
+  }
+
+  .chapter-num {
+    font-family: var(--sans);
+    font-size: 10pt;
+    color: var(--brand);
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    margin-bottom: 6pt;
+  }
+
+  p {
+    margin: 0 0 10pt 0;
+    line-height: 1.55;
+    color: var(--near-black);
+  }
+
+  .lead {
+    font-size: 12pt;
+    line-height: 1.55;
+    color: var(--dark-warm);
+    margin-bottom: 14pt;
+  }
+
+  .hl { color: var(--brand); font-weight: 500; }
+  strong { font-weight: 500; }
+
+  ul, ol {
+    margin: 6pt 0 10pt 0;
+    padding-left: 20pt;
+    line-height: 1.55;
+  }
+  ul li::marker { color: var(--brand); }
+  ol li::marker { color: var(--brand); font-weight: 500; }
+
+  blockquote, .quote {
+    border-left: 2pt solid var(--brand);
+    margin: 12pt 0;
+    padding: 4pt 0 4pt 16pt;
+    color: var(--olive);
+    line-height: 1.55;
+    break-inside: avoid;
+  }
+
+  code {
+    font-family: "JetBrains Mono", "SF Mono", Consolas, "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", monospace;
+    font-size: 9pt;
+    background: var(--ivory);
+    padding: 1pt 4pt;
+    border-radius: 2pt;
+    color: var(--dark-warm);
+  }
+  pre {
+    font-family: "JetBrains Mono", "SF Mono", Consolas, "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC", "Songti SC", monospace;
+    font-size: 8pt;
+    line-height: 1.4;
+    background: var(--ivory);
+    border: 0.5pt solid var(--border-soft);
+    padding: 10pt 14pt;
+    margin: 10pt 0;
+    white-space: pre-wrap;
+    color: var(--near-black);
+    break-inside: avoid;
+  }
+  pre code { background: transparent; padding: 0; font-size: inherit; }
+
+  table, .kami-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+  table th, .kami-table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--dark-warm);
+    padding: 6pt 8pt;
+    border-bottom: 1pt solid var(--border);
+    background: transparent;
+  }
+  table td, .kami-table td {
+    padding: 5pt 8pt;
+    border-bottom: 0.3pt solid var(--border-soft);
+    vertical-align: top;
+  }
+  table.striped tbody tr:nth-child(even) td, .kami-table.striped tbody tr:nth-child(even) td {
+    background: var(--ivory);
+  }
+
+  .callout {
+    background: var(--ivory);
+    border-left: 2pt solid var(--brand);
+    padding: 10pt 14pt;
+    border-radius: 3pt;
+    margin: 12pt 0;
+    line-height: 1.55;
+    break-inside: avoid;
+  }
+
+  .takeaway {
+    background: var(--ivory);
+    border: 0.5pt solid var(--border);
+    padding: 10pt 14pt;
+    margin: 14pt 0;
+    break-inside: avoid;
+  }
+  .takeaway-label {
+    font-family: var(--sans);
+    font-size: 9pt;
+    color: var(--brand);
+    letter-spacing: 0.5pt;
+    text-transform: uppercase;
+    margin-bottom: 4pt;
+  }
+
+  .tag {
+    display: inline-block;
+    background: var(--tag-bg);
+    color: var(--brand);
+    font-family: var(--sans);
+    font-size: 9pt;
+    font-weight: 500;
+    padding: 1pt 6pt;
+    border-radius: 3pt;
+    margin-right: 4pt;
+  }
+
+  figure {
+    margin: 14pt 0;
+    break-inside: avoid;
+  }
+
+  .chapter { break-before: page; }
+
+  .roadmap-phase {
+    background: var(--ivory);
+    border: 0.5pt solid var(--border);
+    padding: 12pt 16pt;
+    margin: 14pt 0;
+    break-inside: avoid;
+  }
+  .phase-header {
+    font-family: var(--sans);
+    font-size: 11pt;
+    font-weight: 500;
+    color: var(--brand);
+    margin-bottom: 8pt;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ COVER ═════════════ -->
+<section class="cover">
+  <div>
+    <div class="cover-eyebrow">开源项目计划书</div>
+    <div class="cover-title">KnowledgeVault<br>个人知识库收集整理工具箱</div>
+    <div class="cover-sub">
+      将散落在网络、AI 对话、笔记中的信息碎片，自动转化为结构化的知识库。
+      以 Kami 排版的优雅形态呈现，支持全文搜索、智能标签、云端同步。
+    </div>
+  </div>
+  <div class="cover-meta">
+    <strong>版本：</strong>V1.0 · 2026年5月<br>
+    <strong>开源协议：</strong>MIT License<br>
+    <strong>技术栈：</strong>Python + FastAPI + Meilisearch + Kami<br>
+    <strong>基于：</strong>Kami (Tw93) · clip-to-kami (Anarcadia)
+  </div>
+</section>
+
+<!-- ═════════════ 目录 ═════════════ -->
+<section class="toc">
+  <h2>目录</h2>
+  <div class="toc-item">
+    <span class="toc-num">01</span>
+    <span class="toc-title">执行摘要</span>
+    <span class="toc-page">03</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">02</span>
+    <span class="toc-title">背景与问题</span>
+    <span class="toc-page">04</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">03</span>
+    <span class="toc-title">产品定位</span>
+    <span class="toc-page">05</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">04</span>
+    <span class="toc-title">核心功能</span>
+    <span class="toc-page">06</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">05</span>
+    <span class="toc-title">技术架构</span>
+    <span class="toc-page">08</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">06</span>
+    <span class="toc-title">开发路线图</span>
+    <span class="toc-page">10</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">07</span>
+    <span class="toc-title">商业模式</span>
+    <span class="toc-page">12</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">08</span>
+    <span class="toc-title">风险分析</span>
+    <span class="toc-page">13</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">09</span>
+    <span class="toc-title">团队规划</span>
+    <span class="toc-page">14</span>
+  </div>
+  <div class="toc-item">
+    <span class="toc-num">10</span>
+    <span class="toc-title">下一步行动</span>
+    <span class="toc-page">15</span>
+  </div>
+</section>
+
+<!-- ═════════════ Chapter 01：执行摘要 ═════════════ -->
+<section>
+  <div class="chapter-num">01 · Executive Summary</div>
+  <h1>执行摘要</h1>
+
+  <p class="lead">
+    KnowledgeVault 是一款面向知识工作者、开发者、研究者的<span class="hl">个人知识库管理工具</span>。
+    它将散落在各处的信息碎片——网页文章、微信公众号内容、AI 对话、本地笔记——自动收集、智能整理、优雅呈现，
+    最终转化为可搜索、可导出、可分享的结构化知识库。
+  </p>
+
+  <h2>核心价值主张</h2>
+  <ul>
+    <li><strong>一键收集</strong>：浏览器扩展 + 剪贴板监控 + API 接口，多渠道无缝收集</li>
+    <li><strong>智能处理</strong>：AI 自动摘要、标签提取、去重检测，减轻人工整理负担</li>
+    <li><strong>优雅呈现</strong>：基于 Kami 设计系统，生成可打印的 PDF 文档</li>
+    <li><strong>强大搜索</strong>：Meilisearch 全文索引，毫秒级响应</li>
+    <li><strong>完全掌控</strong>：数据存储在本地，可选云盘同步，隐私安全</li>
+  </ul>
+
+  <h2>核心 Takeaways</h2>
+  <ul>
+    <li><strong>市场需求</strong>：信息过载时代，个人知识管理工具成为刚需</li>
+    <li><strong>技术可行</strong>：基于成熟开源项目（Kami + clip-to-kami），4-6 个月可完成 MVP</li>
+    <li><strong>开源策略</strong>：MIT 协议，建立社区生态，通过增值服务变现</li>
+    <li><strong>差异化竞争</strong>：专注<span class="hl">"收集 → 整理 → 呈现"</span>闭环，而非 Evernote/Notion 的全功能路线</li>
+  </ul>
+
+  <div class="takeaway">
+    <div class="takeaway-label">项目回答的问题</div>
+    如何优雅地管理碎片化信息？如何让 AI 辅助知识整理？如何构建个人第二大脑？
+    KnowledgeVault 给出了一个开源、轻量、可定制的答案。
+  </div>
+</section>
+
+<!-- ═════════════ Chapter 02：背景 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">02 · Background</div>
+  <h1>背景与问题</h1>
+
+  <h2>当前现状</h2>
+  <p>知识工作者每天面临的信息摄入量持续增长：</p>
+  <ul>
+    <li><strong>网页内容</strong>：技术博客、新闻文章、学术论文</li>
+    <li><strong>社交媒体</strong>：微信公众号、Twitter、知乎</li>
+    <li><strong>AI 对话</strong>：ChatGPT、Claude 等生成式 AI 的对话记录</li>
+    <li><strong>本地笔记</strong>：Markdown、Notion、Obsidian 等工具的零散笔记</li>
+  </ul>
+  <p>这些信息散落在各处，缺乏统一的管理入口，导致：</p>
+  <ul>
+    <li>收藏后永不回顾（"数字囤积症"）</li>
+    <li>需要时找不到（搜索困难）</li>
+    <li>整理耗时耗力（手动分类、打标签）</li>
+  </ul>
+
+  <h2>核心问题</h2>
+  <div class="callout">
+    现有知识管理工具（Notion、Obsidian、Evernote）都要求用户主动创建内容，
+    但<span class="hl">80% 的知识来自于外部消费</span>（阅读、观看、对话）。
+    缺少一个"先收集、后整理"的轻量级工具。
+  </div>
+
+  <h2>市场机会</h2>
+  <table class="striped">
+    <thead>
+      <tr>
+        <th>工具类型</th>
+        <th>代表产品</th>
+        <th>局限性</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>笔记工具</td>
+        <td>Notion, Obsidian</td>
+        <td>主动创作为主，缺少被动收集能力</td>
+      </tr>
+      <tr>
+        <td>稍后读</td>
+        <td>Pocket, Instapaper</td>
+        <td>只存不整理，缺少知识内化</td>
+      </tr>
+      <tr>
+        <td>书签工具</td>
+        <td>Raindrop.io</td>
+        <td>只保存链接，无法保存内容</td>
+      </tr>
+      <tr>
+        <td><strong>KnowledgeVault</strong></td>
+        <td>-</td>
+        <td><strong>收集 + 整理 + 呈现三位一体</strong></td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═════════════ Chapter 03：产品定位 ═════════════ -->
+<section>
+  <div class="chapter-num">03 · Product</div>
+  <h1>产品定位</h1>
+
+  <h2>目标用户</h2>
+  <div class="takeaway">
+    <div class="takeaway-label">核心用户画像</div>
+    <strong>知识工作者</strong>：开发者、研究员、学生、内容创作者<br>
+    特征：信息摄入量大，有整理习惯，重视数据隐私，偏好开源工具
+  </div>
+
+  <h2>产品形态</h2>
+  <p><strong>双模式设计</strong>，适应不同使用场景：</p>
+  <ul>
+    <li><strong>CLI 工具模式</strong>：面向开发者和高级用户，命令行操作，可集成到脚本</li>
+    <li><strong>Skill 插件模式</strong>：面向 AI 助手用户（Claude Code、OpenClaw），自然语言交互</li>
+    <li><strong>可选 Web UI</strong>：面向非技术用户，图形界面操作（Phase 4）</li>
+  </ul>
+
+  <h2>差异化优势</h2>
+  <table class="striped">
+    <thead>
+      <tr>
+        <th>维度</th>
+        <th>KnowledgeVault</th>
+        <th>Notion/Obsidian</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>内容来源</td>
+        <td>网页、AI、本地（多源自动收集）</td>
+        <td>手动创建（主动创作）</td>
+      </tr>
+      <tr>
+        <td>整理方式</td>
+        <td>AI 自动摘要 + 标签</td>
+        <td>手动分类整理</td>
+      </tr>
+      <tr>
+        <td>输出格式</td>
+        <td>可打印 PDF（Kami 排版）</td>
+        <td>数字文档为主</td>
+      </tr>
+      <tr>
+        <td>数据存储</td>
+        <td>本地优先 + 可选云同步</td>
+        <td>云端服务（SaaS）</td>
+      </tr>
+      <tr>
+        <td>开放性</td>
+        <td>开源（MIT 协议）</td>
+        <td>闭源 / 部分开源</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═════════════ Chapter 04：核心功能 ═════════════ -->
+<section>
+  <div class="chapter-num">04 · Features</div>
+  <h1>核心功能</h1>
+
+  <h2>功能全景图</h2>
+  <p class="lead">三大模块、十项核心功能，覆盖知识管理的全流程。</p>
+
+  <h3>模块一：智能收集</h3>
+  <ul>
+    <li><strong>网页抓取</strong>：输入 URL，自动提取正文、图片，支持微信文章、SPA 站点（基于 clip-to-kami）</li>
+    <li><strong>剪贴板监控</strong>：后台监控剪贴板，智能识别 AI 对话并自动保存</li>
+    <li><strong>浏览器扩展</strong>：一键收集当前页面，支持选中内容收集</li>
+    <li><strong>本地导入</strong>：支持 Markdown、txt、HTML 文件批量导入</li>
+  </ul>
+
+  <h3>模块二：智能处理</h3>
+  <ul>
+    <li><strong>AI 摘要</strong>：自动生成内容摘要，支持 GPT-4o-mini、Claude Haiku</li>
+    <li><strong>智能标签</strong>：NLP 提取关键词，自动打标签</li>
+    <li><strong>去重检测</strong>：基于 URL、标题、内容相似度检测重复项</li>
+  </ul>
+
+  <h3>模块三：知识管理</h3>
+  <ul>
+    <li><strong>全文搜索</strong>：Meilisearch 驱动，毫秒级响应，支持标签过滤</li>
+    <li><strong>合集管理</strong>：自定义知识合集，支持嵌套目录</li>
+    <li><strong>优雅导出</strong>：单个条目或合集导出为 Kami PDF，支持黑白打印版</li>
+    <li><strong>云盘同步</strong>：通过 rclone 外挂，支持 OneDrive、Google Drive 等</li>
+  </ul>
+
+  <h2>用户场景示例</h2>
+  <div class="callout">
+    <strong>场景：开发者学习 Python</strong><br><br>
+    1. 浏览器扩展收集 5 篇技术博客<br>
+    2. 剪贴板监控自动捕获 3 次 ChatGPT 对话<br>
+    3. AI 自动生成摘要、提取标签（#Python #异步编程）<br>
+    4. 创建合集"Python 学习路径"，将 8 个条目归类<br>
+    5. 导出为 PDF，打印成册，线下学习
+  </div>
+</section>
+
+<!-- ═════════════ Chapter 05：技术架构 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">05 · Architecture</div>
+  <h1>技术架构</h1>
+
+  <h2>技术栈选型</h2>
+  <table class="striped">
+    <thead>
+      <tr>
+        <th>层级</th>
+        <th>技术选型</th>
+        <th>理由</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>核心语言</td>
+        <td>Python 3.10+</td>
+        <td>复用 clip-to-kami，生态丰富</td>
+      </tr>
+      <tr>
+        <td>CLI 框架</td>
+        <td>Click / Typer</td>
+        <td>声明式 CLI，开发效率高</td>
+      </tr>
+      <tr>
+        <td>数据库</td>
+        <td>SQLite</td>
+        <td>零配置、单文件、跨平台</td>
+      </tr>
+      <tr>
+        <td>搜索引擎</td>
+        <td>Meilisearch</td>
+        <td>轻量级、毫秒级响应、中文友好</td>
+      </tr>
+      <tr>
+        <td>PDF 引擎</td>
+        <td>WeasyPrint (首选) + Playwright (降级)</td>
+        <td>兼容 Kami 排版</td>
+      </tr>
+      <tr>
+        <td>AI 集成</td>
+        <td>OpenAI API / Anthropic API</td>
+        <td>可插拔设计，支持本地模型</li>
+      </tr>
+      <tr>
+        <td>浏览器自动化</td>
+        <td>Playwright</td>
+        <td>支持 Chromium/Edge/Firefox</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>系统架构图</h2>
+  <pre>
+┌─────────────────────────────────────────────────────────────┐
+│                    KnowledgeVault                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐   │
+│  │  收集器     │  │  处理器     │  │   知识库管理     │   │
+│  │ Collector   │  │ Processor   │  │   Vault Manager  │   │
+│  └─────────────┘  └─────────────┘  └──────────────────┘   │
+│         │                  │                    │           │
+│         ▼                  ▼                    ▼           │
+│  ┌─────────────┐  ┌─────────────┐  ┌──────────────────┐   │
+│  │• 浏览器扩展  │  │• 内容提取    │  │• MeiliSearch     │   │
+│  │• 剪贴板监控  │  │• AI 摘要     │  │• 全文搜索        │   │
+│  │• API 接口    │  │• 去重检测    │  │• 导出 PDF        │   │
+│  └─────────────┘  └─────────────┘  └──────────────────┘   │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+  </pre>
+
+  <h2>数据模型</h2>
+  <p>核心数据结构：Item（知识条目）</p>
+  <pre>
+{
+  "id": "20260512_171230_abc123",
+  "title": "深入理解 Python 异步编程",
+  "source_type": "webpage",
+  "source_url": "https://example.com/python-async",
+  "content_html": "&lt;div&gt;...&lt;/div&gt;",
+  "ai_summary": "本文讲解 async/await 原理...",
+  "tags": ["Python", "异步编程"],
+  "collection_id": "python_learning",
+  "created_at": "2026-05-12T17:12:30+08:00"
+}
+  </pre>
+
+  <h2>目录结构设计</h2>
+  <pre>
+~/KnowledgeVault/
+├── config/           # 配置文件
+├── data/
+│   ├── vault.db     # SQLite 数据库
+│   └── index/       # Meilisearch 索引
+├── items/            # 知识条目
+│   ├── inbox/       # 待整理
+│   └── archive/     # 已归档
+├── pdf/              # Kami PDF 归档
+└── sync/             # 云盘同步配置
+  </pre>
+</section>
+
+<!-- ═════════════ Chapter 06：开发路线 ═════════════ -->
+<section>
+  <div class="chapter-num">06 · Roadmap</div>
+  <h1>开发路线图</h1>
+
+  <p class="lead">分 5 个阶段，预计 <span class="hl">4-6 个月</span>完成完整产品。</p>
+
+  <div class="roadmap-phase">
+    <div class="phase-header">Phase 1：核心功能（MVP）｜ 4-6 周</div>
+    <ul>
+      <li>集成 clip-to-kami（网页/微信/EPUB 转换）</li>
+      <li>SQLite 数据存储 + CRUD</li>
+      <li>CLI 命令框架（add/search/list/export）</li>
+      <li>基础搜索（SQL LIKE）</li>
+      <li>Skill 模式适配</li>
+    </ul>
+    <p><strong>里程碑</strong>：能在本地 CLI 环境收集、搜索、查看内容</p>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="phase-header">Phase 2：智能增强｜ 3-4 周</div>
+    <ul>
+      <li>AI 摘要（OpenAI API 集成）</li>
+      <li>剪贴板监控（AI 对话捕获）</li>
+      <li>自动标签提取（jieba + TF-IDF）</li>
+      <li>去重检测（URL + 相似度）</li>
+      <li>合集管理</li>
+    </ul>
+    <p><strong>里程碑</strong>：能自动整理、归纳内容</p>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="phase-header">Phase 3：搜索与导出｜ 2-3 周</div>
+    <ul>
+      <li>Meilisearch 集成</li>
+      <li>高级搜索（过滤/排序/高亮）</li>
+      <li>批量导出 PDF（合集导出）</li>
+      <li>自定义 Kami 模板</li>
+    </ul>
+    <p><strong>里程碑</strong>：强大的搜索和导出能力</p>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="phase-header">Phase 4：生态扩展｜ 3-4 周</div>
+    <ul>
+      <li>浏览器扩展（Chrome/Firefox）</li>
+      <li>云盘同步（rclone 外挂）</li>
+      <li>Web UI（可选，Vue 3 + FastAPI）</li>
+      <li>数据导入/导出（OPML、JSON）</li>
+    </ul>
+    <p><strong>里程碑</strong>：完整的产品体验</p>
+  </div>
+
+  <div class="roadmap-phase">
+    <div class="phase-header">Phase 5：Windows 原生支持｜ 2-3 周</div>
+    <ul>
+      <li>GTK 运行时适配（MSYS2）</li>
+      <li>Playwright Edge 集成</li>
+      <li>PowerShell 安装脚本</li>
+      <li>跨平台路径处理</li>
+    </ul>
+    <p><strong>里程碑</strong>：Windows 11 原生可用</p>
+  </div>
+
+  <h2>时间表总览</h2>
+  <table class="striped">
+    <thead>
+      <tr>
+        <th>月份</th>
+        <th>阶段</th>
+        <th>可交付成果</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Month 1</td>
+        <td>Phase 1</td>
+        <td>MVP 可用（CLI 基础功能）</td>
+      </tr>
+      <tr>
+        <td>Month 2</td>
+        <td>Phase 2</td>
+        <td>AI 增强功能上线</td>
+      </tr>
+      <tr>
+        <td>Month 3</td>
+        <td>Phase 3</td>
+        <td>搜索和导出功能完善</td>
+      </tr>
+      <tr>
+        <td>Month 4</td>
+        <td>Phase 4</td>
+        <td>浏览器扩展 + Web UI</td>
+      </tr>
+      <tr>
+        <td>Month 5</td>
+        <td>Phase 5</td>
+        <td>Windows 原生支持</td>
+      </tr>
+      <tr>
+        <td>Month 6</td>
+        <td>优化</td>
+        <td>稳定版本 V1.0 发布</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+<!-- ═════════════ Chapter 07：商业模式 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">07 · Business</div>
+  <h1>商业模式</h1>
+
+  <h2>开源策略</h2>
+  <div class="callout">
+    <strong>核心定位：开源免费 + 增值服务</strong><br><br>
+    核心功能完全开源（MIT 协议），建立社区和生态。<br>
+    通过高级功能、企业支持、托管服务实现可持续运营。
+  </div>
+
+  <h2>盈利模式</h2>
+  <ul>
+    <li><strong>高级功能订阅</strong>：AI 摘要额度（10次/月免费，无限使用 $9/月）</li>
+    <li><strong>企业支持</strong>：私有部署、定制开发、技术支持（$299/月起）</li>
+    <li><strong>托管服务</strong>：云端版本，无需本地安装（$4.99/月）</li>
+    <li><strong>浏览器扩展付费版</strong>：高级功能（如 OCR 文字识别）</li>
+  </ul>
+
+  <h2>成本结构</h2>
+  <table class="striped">
+    <thead>
+      <tr>
+        <th>成本项</th>
+        <th>月度成本</th>
+        <th>说明</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>AI API 调用</td>
+        <td>$50-200</td>
+        <td>按使用量计费（OpenAI / Anthropic）</td>
+      </tr>
+      <tr>
+        <td>服务器托管</td>
+        <td>$20-100</td>
+        <td>GitHub Sponsors / Vercel（托管服务）</td>
+      </tr>
+      <tr>
+        <td>域名 + SSL</td>
+        <td>$15</td>
+        <td>品牌建设</td>
+      </tr>
+      <tr>
+        <td>社区激励</td>
+        <td>$100-500</td>
+        <td>贡献者奖励、Issue Bounties</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>收入预测（第一年）</h2>
+  <ul>
+    <li>个人订阅：100 用户 × $9/月 = $900/月</li>
+    <li>企业支持：5 客户 × $299/月 = $1,495/月</li>
+    <li>托管服务：50 用户 × $4.99/月 = $250/月</li>
+    <li><strong>月度收入（Year 1 末）</strong>：约 $2,645</li>
+  </ul>
+</section>
+
+<!-- ═════════════ Chapter 08：风险分析 ═════════════ -->
+<section>
+  <div class="chapter-num">08 · Risks</div>
+  <h1>风险分析</h1>
+
+  <h2>技术风险</h2>
+  <table class="striped">
+    <thead>
+      <tr>
+        <th>风险</th>
+        <th>影响</th>
+        <th>概率</th>
+        <th>缓解措施</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>WeasyPrint Windows 兼容性</td>
+        <td>高</td>
+        <td>中</td>
+        <td>提供 Playwright PDF 降级方案</td>
+      </tr>
+      <tr>
+        <td>AI API 成本过高</td>
+        <td>中</td>
+        <td>中</td>
+        <td>支持本地模型（Ollama）</td>
+      </tr>
+      <tr>
+        <td>Meilisearch 性能瓶颈</td>
+        <td>低</td>
+        <td>低</td>
+        <td>单用户场景下不太可能遇到</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>市场风险</h2>
+  <ul>
+    <li><strong>巨头竞争</strong>：Notion/Obsidian 可能增加类似功能</li>
+    <li>缓解：专注细分场景（AI 对话收集、Kami 排版），建立差异化</li>
+  </ul>
+  <ul>
+    <li><strong>用户获取</strong>：开源项目推广难度大</li>
+    <li>缓解：通过 Product Hunt、Hacker News、中文社区推广</li>
+  </ul>
+
+  <h2>运营风险</h2>
+  <ul>
+    <li><strong>维护负担</strong>：开源项目长期维护需持续投入</li>
+    <li>缓解：建立社区贡献机制，招募核心维护者</li>
+  </ul>
+</section>
+
+<!-- ═════════════ Chapter 09：团队规划 ═════════════ -->
+<section class="chapter">
+  <div class="chapter-num">09 · Team</div>
+  <h1>团队规划</h1>
+
+  <h2>核心角色</h2>
+  <table class="striped">
+    <thead>
+      <tr>
+        <th>角色</th>
+        <th>职责</th>
+        <th>技能要求</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>项目负责人</strong></td>
+        <td>产品方向、社区运营、技术决策</td>
+        <td>全栈开发、项目管理</td>
+      </tr>
+      <tr>
+        <td><strong>后端工程师</strong></td>
+        <td>核心功能开发、API 设计</td>
+        <td>Python、FastAPI、SQLite</td>
+      </tr>
+      <tr>
+        <td><strong>前端工程师</strong></td>
+        <td>Web UI、浏览器扩展（Phase 4）</td>
+        <td>Vue.js、浏览器扩展开发</td>
+      </tr>
+      <tr>
+        <td><strong>AI 工程师</strong></td>
+        <td>AI 摘要、标签提取优化</td>
+        <td>NLP、Prompt Engineering</td>
+      </tr>
+      <tr>
+        <td><strong>技术文档</strong></td>
+        <td>README、API 文档、教程</td>
+        <td>技术写作、Markdown</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>协作模式</h2>
+  <ul>
+    <li><strong>开发模式</strong>：GitHub + Git Flow（feature 分支开发）</li>
+    <li><strong>沟通工具</strong>：Discord / Slack（社区）+ GitHub Discussions（技术讨论）</li>
+    <li><strong>任务管理</strong>：GitHub Projects + Issues（看板式管理）</li>
+    <li><strong>文档协作</strong>：GitHub Wiki + Notion（内部文档）</li>
+  </ul>
+
+  <h2>社区建设</h2>
+  <div class="takeaway">
+    <div class="takeaway-label">开源社区策略</div>
+    <strong>贡献者激励</strong>：Contributors.md 列表、Issue Bounties（$10-50/issue）<br>
+    <strong>早鸟用户</strong>：Discord VIP 角色、功能优先体验权<br>
+    <strong>合作开发</strong>：欢迎高校、开发者提交 PR
+  </div>
+</section>
+
+<!-- ═════════════ Chapter 10：下一步 ═════════════ -->
+<section>
+  <div class="chapter-num">10 · Next Steps</div>
+  <h1>下一步行动</h1>
+
+  <h2>立即行动（本周）</h2>
+  <ol>
+    <li><strong>创建 GitHub 仓库</strong>
+      <ul>
+        <li>组织：knowledge-vault</li>
+        <li>仓库名：kv</li>
+        <li>协议：MIT License</li>
+      </ul>
+    </li>
+    <li><strong>初始化项目结构</strong>
+      <ul>
+        <li>Python 虚拟环境 + 依赖管理（pyproject.toml）</li>
+        <li>目录结构 + README.md</li>
+        <li>集成 clip-to-kami（submodule）</li>
+      </ul>
+    </li>
+    <li><strong>实现第一个 CLI 命令</strong>
+      <ul>
+        <li><code>kv add &lt;url&gt;</code>（添加网页）</li>
+        <li><code>kv list</code>（列出所有条目）</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h2>近期目标（Month 1）</h2>
+  <ul>
+    <li>完成 Phase 1 核心 MVP</li>
+    <li>发布 Alpha 版本（内测）</li>
+    <li>招募 2-3 名核心贡献者</li>
+    <li>发布第一篇技术博客（介绍项目）</li>
+  </ul>
+
+  <h2>对外沟通</h2>
+  <div class="callout">
+    <strong>分享给潜在合作者时，重点强调：</strong><br><br>
+    1. 这是一个<span class="hl">解决真实痛点</span>的工具（信息过载、知识管理）<br>
+    2. 技术栈成熟、开发周期短（4-6 个月 MVP）<br>
+    3. 开源策略清晰，有可持续的商业模式<br>
+    4. 欢迎早期加入，成为核心贡献者
+  </div>
+
+  <h2>联系方式</h2>
+  <ul>
+    <li><strong>GitHub</strong>：https://github.com/your-org/knowledge-vault</li>
+    <li><strong>Discord</strong>：https://discord.gg/knowledge-vault</li>
+    <li><strong>邮箱</strong>：team@knowledgevault.dev</li>
+  </ul>
+
+  <div class="takeaway">
+    <div class="takeaway-label">Call to Action</div>
+    如果你认同这个愿景，欢迎加入我们！<br>
+    无论是代码贡献、产品设计、文档编写，还是社区运营，<br>
+    每一份力量都让 KnowledgeVault 更好。
+  </div>
+</section>
+
+</body>
+</html>

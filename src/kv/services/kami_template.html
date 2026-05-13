@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>{{title}}</title>
+<style>
+  /* ========== Kami Design System ========== */
+
+  /* Font definitions */
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: local("TsangerJinKai02"), local("STKaiti"),
+         url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W04.ttf") format("truetype");
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: "TsangerJinKai02";
+    src: local("TsangerJinKai02"), local("STKaiti"),
+         url("https://cdn.jsdelivr.net/gh/tw93/Kami@main/assets/fonts/TsangerJinKai02-W05.ttf") format("truetype");
+    font-weight: 500;
+    font-style: normal;
+  }
+
+  /* Page setup for PDF */
+  @page {
+    size: A4;
+    margin: 20mm 22mm 22mm 22mm;
+    background: #f5f4ed;
+
+    @bottom-center {
+      content: counter(page) "  ·  " "{{title}}";
+      font-family: "TsangerJinKai02", "Source Han Serif SC",
+                   "Noto Serif CJK SC", "Songti SC", "STSong", "FangSong", serif;
+      font-size: 9pt;
+      color: #6b6a64;
+    }
+  }
+
+  @page:first {
+    @bottom-center { content: ""; }
+  }
+
+  /* CSS Variables - Kami Color System */
+  :root {
+    --parchment: #f5f4ed;
+    --ivory:     #faf9f5;
+    --near-black:#141413;
+    --dark-warm: #3d3d3a;
+    --olive:     #504e49;
+    --stone:     #6b6a64;
+    --brand:     #1B365D;
+    --border:    #e8e6dc;
+    --border-soft:#e5e3d8;
+    --tag-bg:    #E4ECF5;
+    --serif: "TsangerJinKai02", "Source Han Serif SC", "Noto Serif CJK SC",
+            "Songti SC", "STSong", "FangSong", "FangSong_GB18030", Georgia, serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--parchment);
+    color: var(--near-black);
+  }
+
+  @media screen {
+    body {
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 20mm 22mm 22mm 22mm;
+      background: var(--parchment);
+    }
+  }
+
+  body {
+    font-family: var(--serif);
+    font-size: 10.5pt;
+    line-height: 1.55;
+    letter-spacing: 0.3pt;
+  }
+
+  /* ========== Cover ========== */
+  .cover {
+    min-height: 240mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 40mm 0 0 0;
+    break-after: page;
+  }
+
+  .cover-eyebrow {
+    font-size: 10pt;
+    color: var(--brand);
+    letter-spacing: 1pt;
+    text-transform: uppercase;
+    margin-bottom: 18pt;
+  }
+
+  .cover-title {
+    font-size: 36pt;
+    font-weight: 500;
+    color: var(--near-black);
+    line-height: 1.15;
+    letter-spacing: 0.3pt;
+    margin-bottom: 16pt;
+  }
+
+  .cover-meta {
+    font-size: 10pt;
+    color: var(--stone);
+    line-height: 1.5;
+  }
+
+  .cover-meta strong {
+    color: var(--dark-warm);
+    font-weight: 500;
+  }
+
+  /* ========== Content Section ========== */
+  .document {
+    padding: 0;
+  }
+
+  /* ========== Headings ========== */
+  h1 {
+    font-size: 22pt;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0 0 10pt 0;
+    border-left: 2.5pt solid var(--brand);
+    border-radius: 1.5pt;
+    padding-left: 8pt;
+    color: var(--near-black);
+    break-after: avoid;
+  }
+
+  h2 {
+    font-size: 16pt;
+    font-weight: 500;
+    line-height: 1.25;
+    margin: 24pt 0 6pt 0;
+    color: var(--near-black);
+    break-after: avoid;
+  }
+
+  h3 {
+    font-size: 13pt;
+    font-weight: 500;
+    line-height: 1.3;
+    margin: 18pt 0 4pt 0;
+    color: var(--dark-warm);
+    break-after: avoid;
+  }
+
+  h4 {
+    font-size: 11pt;
+    font-weight: 500;
+    line-height: 1.3;
+    margin: 14pt 0 4pt 0;
+    color: var(--olive);
+  }
+
+  /* ========== Paragraphs ========== */
+  p {
+    margin: 0 0 10pt 0;
+    line-height: 1.55;
+    color: var(--near-black);
+  }
+
+  strong {
+    font-weight: 500;
+    color: var(--near-black);
+  }
+
+  em, i {
+    font-style: italic;
+  }
+
+  /* ========== Lists ========== */
+  ul, ol {
+    margin: 6pt 0 10pt 0;
+    padding-left: 20pt;
+    line-height: 1.55;
+  }
+
+  ul li::marker {
+    color: var(--brand);
+  }
+
+  ol li::marker {
+    color: var(--brand);
+    font-weight: 500;
+  }
+
+  /* ========== Quote ========== */
+  blockquote {
+    border-left: 2pt solid var(--brand);
+    margin: 12pt 0;
+    padding: 4pt 0 4pt 16pt;
+    color: var(--olive);
+    line-height: 1.55;
+    break-inside: avoid;
+  }
+
+  /* ========== Code ========== */
+  code {
+    font-family: "JetBrains Mono", "SF Mono", Consolas, "Courier New",
+                 "TsangerJinKai02", "Source Han Serif SC", "Songti SC", monospace;
+    font-size: 9pt;
+    background: var(--ivory);
+    padding: 1pt 4pt;
+    border-radius: 2pt;
+    color: var(--dark-warm);
+  }
+
+  pre {
+    font-family: "JetBrains Mono", "SF Mono", Consolas, "Courier New",
+                 "TsangerJinKai02", "Source Han Serif SC", "Songti SC", monospace;
+    font-size: 9pt;
+    line-height: 1.5;
+    background: var(--ivory);
+    border: 0.5pt solid var(--border-soft);
+    padding: 10pt 14pt;
+    margin: 10pt 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--near-black);
+    break-inside: avoid;
+  }
+
+  pre code {
+    background: transparent;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  /* ========== Table ========== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9.5pt;
+    margin: 12pt 0;
+    break-inside: avoid;
+  }
+
+  table th {
+    text-align: left;
+    font-weight: 500;
+    color: var(--dark-warm);
+    padding: 6pt 8pt;
+    border-bottom: 1pt solid var(--border);
+    background: transparent;
+  }
+
+  table td {
+    padding: 5pt 8pt;
+    border-bottom: 0.3pt solid var(--border-soft);
+    vertical-align: top;
+  }
+
+  /* ========== Figure ========== */
+  figure {
+    margin: 14pt 0;
+    break-inside: avoid;
+  }
+
+  figure img {
+    max-width: 100%;
+    border-radius: 4pt;
+  }
+
+  figcaption {
+    font-size: 9pt;
+    color: var(--stone);
+    margin-top: 6pt;
+    text-align: center;
+  }
+
+  /* ========== Links ========== */
+  a {
+    color: var(--brand);
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  /* ========== Meta ========== */
+  .meta {
+    font-size: 9pt;
+    color: var(--stone);
+    margin: 0.3em 0;
+  }
+
+  .meta strong {
+    color: var(--dark-warm);
+  }
+
+  /* ========== Callout ========== */
+  .callout {
+    background: var(--ivory);
+    border-left: 2pt solid var(--brand);
+    padding: 10pt 14pt;
+    border-radius: 3pt;
+    margin: 12pt 0;
+    line-height: 1.55;
+    break-inside: avoid;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═════════════ COVER ═════════════ -->
+<section class="cover">
+  <div>
+    <div class="cover-eyebrow">网页归档</div>
+    <h1 class="cover-title">{{title}}</h1>
+  </div>
+
+  <div class="cover-meta">
+    <p><strong>Author</strong> {{author}}</p>
+    <p><strong>Source</strong> <a href="{{url}}">{{url}}</a></p>
+    <p><strong>Saved</strong> {{date}}</p>
+  </div>
+</section>
+
+<!-- ═════════════ DOCUMENT ═════════════ -->
+<section class="document">
+  {{content}}
+</section>
+
+</body>
+</html>

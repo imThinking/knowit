@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(pip install:*)",
+      "Bash(timeout:*)",
+      "Bash(set PYTHONPATH=E:PROJECTSknowitsrc:*)",
+      "Bash(kv --help:*)",
+      "Bash(kv add:*)",
+      "Bash(kv collections)",
+      "Bash(kv stats)",
+      "Bash(kv show:*)",
+      "Bash(kv export:*)",
+      "Bash(kv similar:*)",
+      "Bash(kv import:*)",
+      "Bash(kv config init:*)",
+      "Bash(kv config list:*)",
+      "Bash(kv config get:*)",
+      "Bash(kv config set:*)",
+      "Bash(kv delete:*)",
+      "Bash(kv exports list:*)",
+      "Bash(kv exports stats:*)",
+      "Bash(kv exports:*)",
+      "Bash(kv backup create:*)",
+      "Bash(kv search:*)",
+      "Bash(kv tags list:*)",
+      "Bash(kv tags items 测试标签)",
+      "Bash(kv backup list:*)",
+      "Bash(dir E: 2)",
+      "Bash(findstr:*)",
+      "Bash(.venvScriptsactivate)",
+      "Bash(cmd:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

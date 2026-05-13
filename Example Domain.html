@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example Domain</title>
+    <style>
+        
+        @media print {
+            @page {
+                size: A4;
+                margin: 2cm;
+            }
+            .print-tip, .no-print {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+            }
+            .document {
+                box-shadow: none !important;
+                max-width: 100% !important;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Songti SC', 'SimSun', 'Source Han Serif CN', serif;
+            font-size: 11pt;
+            line-height: 1.8;
+            color: #2c2c2c;
+            background: #f4f1ea;
+            padding: 2em;
+        }
+
+        .document {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff9f0;
+            padding: 3em;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            border-radius: 8px;
+        }
+
+        header {
+            border-bottom: 2px solid #1B365D;
+            padding-bottom: 1.5em;
+            margin-bottom: 2em;
+        }
+
+        h1 {
+            font-size: 24pt;
+            font-weight: 600;
+            color: #1B365D;
+            line-height: 1.4;
+            margin-bottom: 1em;
+        }
+
+        .metadata {
+            font-size: 9pt;
+            color: #666;
+            margin-top: 1em;
+        }
+
+        .meta {
+            margin: 0.3em 0;
+        }
+
+        .meta a {
+            color: #1B365D;
+            text-decoration: none;
+        }
+
+        .meta a:hover {
+            text-decoration: underline;
+        }
+
+        .content {
+            text-align: justify;
+        }
+
+        .content h1, .content h2, .content h3, .content h4, .content h5, .content h6 {
+            color: #1B365D;
+            margin-top: 1.5em;
+            margin-bottom: 0.8em;
+            font-weight: 600;
+        }
+
+        .content h1 { font-size: 18pt; }
+        .content h2 { font-size: 16pt; }
+        .content h3 { font-size: 14pt; }
+
+        .content p {
+            margin-bottom: 1em;
+            text-indent: 2em;
+        }
+
+        .content p:first-of-type {
+            text-indent: 0;
+        }
+
+        .content a {
+            color: #1B365D;
+            text-decoration: underline;
+        }
+
+        .content code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background: #f0f0f0;
+            padding: 0.2em 0.4em;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .content pre {
+            background: #f5f5f5;
+            border-left: 3px solid #1B365D;
+            padding: 1em;
+            margin: 1em 0;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+
+        .content pre code {
+            background: none;
+            padding: 0;
+        }
+
+        .content blockquote {
+            border-left: 3px solid #1B365D;
+            padding-left: 1em;
+            margin: 1em 0;
+            color: #555;
+            font-style: italic;
+        }
+
+        .content ul, .content ol {
+            margin: 1em 0;
+            padding-left: 2em;
+        }
+
+        .content li {
+            margin: 0.5em 0;
+        }
+
+        .content img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 1.5em auto;
+            border-radius: 4px;
+        }
+
+        .content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5em 0;
+        }
+
+        .content th, .content td {
+            border: 1px solid #ddd;
+            padding: 0.8em;
+            text-align: left;
+        }
+
+        .content th {
+            background: #f5f5f5;
+            font-weight: 600;
+            color: #1B365D;
+        }
+
+        footer {
+            margin-top: 3em;
+            padding-top: 1.5em;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 9pt;
+            color: #999;
+        }
+
+        .print-tip {
+            margin-top: 0.5em;
+            color: #1B365D;
+            font-style: italic;
+        }
+
+        /* Print-specific adjustments */
+        @media print {
+            body {
+                padding: 0;
+            }
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="document">
+        <header>
+            <h1>Example Domain</h1>
+            <div class="metadata"><p class="meta">🔗 来源: <a href="https://example.com" target="_blank">https://example.com</a></p><p class="meta">🕒 保存时间: 2026-05-12 06:48</p></div>
+        </header>
+        <main class="content">
+            <body><div><h1>Example Domain</h1><p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p><p><a href="https://iana.org/domains/example">Learn more</a></p></div></body>
+        </main>
+        <footer>
+            <p>Generated by KnowIt - 2026-05-12 16:23:41</p>
+            <p class="print-tip">💡 提示: 使用 Ctrl+P (或 Cmd+P) 打印为 PDF</p>
+        </footer>
+    </div>
+    <script>
+        // Auto-open print dialog when page loads with ?print parameter
+        if (window.location.search.includes('print')) {
+            window.onload = function() {
+                window.print();
+            };
+        }
+    </script>
+</body>
+</html>
