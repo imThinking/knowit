@@ -30,7 +30,14 @@
       "Bash(findstr:*)",
       "Bash(.venvScriptsactivate)",
       "Bash(cmd:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(gh:*)",
+      "Bash(git remote add:*)",
+      "Bash(git branch:*)",
+      "Bash(git push:*)",
+      "Bash(git remote set-url:*)",
+      "Bash(ssh:*)"
     ]
   }
 }
