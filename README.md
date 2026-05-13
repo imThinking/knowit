@@ -8,10 +8,21 @@
 
 [![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Based on Kami](https://img.shields.io/badge/Design-Kami-important)](https://github.com/tw93/Kami)
 
 [功能特性](#特性) • [快速开始](#快速开始) • [使用指南](#使用指南) • [开发文档](#开发)
 
 </div>
+
+---
+
+<div align="center">
+
+**设计灵感**：基于 [Kami](https://github.com/tw93/Kami) 的优雅设计系统和 [clip-to-kami](https://github.com/Anarcadia/clip-to-kami) 的内容转换实现
+
+</div>
+
+---
 
 ## 简介
 
@@ -22,8 +33,15 @@ KnowIt 是一个命令行工具，用于收集、组织和搜索网页内容。�
 - **本地优先**：所有数据存储在本地，完全掌控你的知识库
 - **智能去重**：基于 simhash 算法自动检测相似和重复内容
 - **灵活组织**：支持标签和层级化合集，轻松管理大量内容
-- **精美导出**：采用 Kami 设计系统，输出专业级 HTML/PDF
+- **精美导出**：采用 [Kami](https://github.com/tw93/Kami) 设计系统，输出专业级 HTML/PDF
 - **命令行友好**：简洁高效的 CLI，适合工作流集成
+
+### 设计灵感
+
+KnowIt 的设计灵感来源于以下优秀项目：
+
+- 🎨 **[Kami](https://github.com/tw93/Kami)** - 采用其温暖优雅的设计系统
+- 📄 **[clip-to-kami](https://github.com/Anarcadia/clip-to-kami)** - 参考其内容转换实现
 
 ## 特性
 
@@ -413,14 +431,21 @@ pip install weasyprint
 
 ### 技术栈
 
-- **Python 3.8+**
-- **Click** - CLI 框架
-- **SQLAlchemy** - ORM
-- **SQLite** - 数据库
-- **BeautifulSoup4** - HTML 解析
-- **simhash** - 相似度检测
-- **jieba** - 中文分词
-- **WeasyPrint** - PDF 生成（可选）
+**核心框架**
+- **[Python](https://www.python.org/)** 3.8+ - 编程语言
+- **[Click](https://github.com/pallets/click)** - CLI 框架
+- **[SQLAlchemy](https://www.sqlalchemy.org/)** - ORM
+- **[SQLite](https://www.sqlite.org/)** - 数据库
+
+**内容处理**
+- **[BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/)** - HTML 解析
+- **[simhash](https://github.com/seomoz/simhash-py)** - 相似度检测
+- **[jieba](https://github.com/fxsjy/jieba)** - 中文分词
+
+**导出功能**
+- **[WeasyPrint](https://weasyprint.org/)** - PDF 生成（可选）
+- 基于 **[Kami](https://github.com/tw93/Kami)** 设计系统
+- 参考 **[clip-to-kami](https://github.com/Anarcadia/clip-to-kami)** 实现
 
 ### 项目结构
 
@@ -435,13 +460,14 @@ knowit/
 │   │   └── database.py     # 数据库模型
 │   ├── services/
 │   │   ├── __init__.py
-│   │   ├── database.py     # 数据库服务
-│   │   ├── scraper.py      # 网页抓取
-│   │   ├── pdf_export.py   # PDF/HTML 导出
-│   │   ├── html_cleaner.py # HTML 清理
-│   │   ├── backup_service.py # 备份服务
-│   │   ├── export_manager.py # 导出管理
-│   │   ├── config_service.py # 配置服务
+│   │   ├── database.py          # 数据库服务
+│   │   ├── scraper.py           # 网页抓取
+│   │   ├── pdf_export.py        # PDF/HTML 导出（基于 Kami）
+│   │   ├── html_cleaner.py      # HTML 清理（参考 clip-to-kami）
+│   │   ├── kami_template.html   # Kami 设计模板
+│   │   ├── backup_service.py    # 备份服务
+│   │   ├── export_manager.py    # 导出管理
+│   │   ├── config_service.py    # 配置服务
 │   │   └── playwright_scraper.py # 动态内容抓取
 │   ├── algorithms/
 │   │   ├── __init__.py
@@ -510,9 +536,31 @@ pytest --cov=kv tests/
 
 ## 设计系统
 
-KnowIt 使用 [Kami](https://github.com/tw93/Kami) 设计系统：
+KnowIt 采用以下开源项目的设计和实现：
 
-### 字体
+### Kami - 设计系统
+
+> [Kami](https://github.com/tw93/Kami) by [@tw93](https://github.com/tw93)
+
+KnowIt 完全遵循 Kami 设计规范，提供专业的文档排版：
+
+- **字体**：TsangerJinKai02（书法楷体）
+- **颜色**：温暖羊皮纸主题（#f5f4ed）
+- **布局**：A4 页面，专业排版
+- **风格**：优雅的中式美学
+
+### clip-to-kami - 内容转换引擎
+
+> [clip-to-kami](https://github.com/Anarcadia/clip-to-kami) by [Anarcadia](https://github.com/Anarcadia)
+
+KnowIt 的 HTML 清理和 PDF 导出功能基于 clip-to-kami 实现：
+
+- HTML 内容清理（特别是微信公众号文章）
+- 图片处理和优化
+- WeasyPrint PDF 生成
+- WeChat 文章特殊处理
+
+### 字体系统
 
 - **主要字体**：TsangerJinKai02（书法楷体）
 - **Fallback 链**：Source Han Serif SC → Noto Serif CJK SC → Songti SC → STSong → FangSong → Georgia → serif
@@ -554,8 +602,34 @@ KnowIt 使用 [Kami](https://github.com/tw93/Kami) 设计系统：
 
 ## 致谢
 
-- [Kami](https://github.com/tw93/Kami) - 优秀的设计系统
-- [clip-to-kami](https://github.com/Anarcadia/clip-to-kami) - 内容转换引擎参考
+KnowIt 的实现得益于以下优秀的开源项目：
+
+### 核心依赖
+
+- **[Kami](https://github.com/tw93/Kami)** by [@tw93](https://github.com/tw93)
+  - 优雅的文档设计系统
+  - 温暖的羊皮纸配色
+  - 专业的中文字体排版
+
+- **[clip-to-kami](https://github.com/Anarcadia/clip-to-kami)** by [Anarcadia](https://github.com/Anarcadia)
+  - HTML 内容清理算法
+  - 微信公众号文章处理
+  - PDF 导出实现参考
+
+### 技术栈
+
+- **[Click](https://github.com/pallets/click)** - 优雅的 CLI 框架
+- **[SQLAlchemy](https://www.sqlalchemy.org/)** - Python SQL 工具包和 ORM
+- **[BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/)** - HTML 解析库
+- **[simhash](https://github.com/seomoz/simhash-py)** - 相似度检测算法
+- **[jieba](https://github.com/fxsjy/jieba)** - 中文分词
+- **[WeasyPrint](https://weasyprint.org/)** - HTML 到 PDF 转换
+
+### 特别感谢
+
+感谢以上项目的所有贡献者和维护者！🙏
+
+KnowIt 站在巨人的肩膀上，为个人知识管理提供了一套完整的解决方案。
 
 ## 联系方式
 
