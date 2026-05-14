@@ -1,4 +1,14 @@
-"""KnowIt CLI 命令行接口"""
+"""KnowIt CLI 命令行接口
+
+NOTE: This file is currently 1600+ lines and should be split into separate modules.
+Future refactoring should organize commands as:
+  - cli.py: Main entry point, add/search commands
+  - commands/collection.py: Collection management
+  - commands/tag.py: Tag management
+  - commands/export.py: Export commands
+  - commands/config.py: Configuration commands
+  - commands/backup.py: Backup commands
+"""
 
 import os
 import sys
