@@ -146,6 +146,15 @@ class ConfigService:
                 'organize_by': 'date',  # 'date' or 'collection'
                 'directory': None,  # None = default (KNOWIT_HOME/exports)
             },
+            'auto_export': {
+                'enabled': True,  # Auto-export enabled by default
+                'directory': None,  # None = default (KNOWIT_HOME/exports)
+                'formats': ['html', 'pdf'],  # Export formats
+                'clean_html': True,  # Clean HTML content
+                'use_kami': True,  # Use Kami full format with cover page
+                'organize_by': 'collection',  # Organize by: 'date', 'collection', or 'none'
+                'on_error': 'warn',  # Error handling: 'warn' or 'ignore'
+            },
             'search': {
                 'limit': 20,
                 'preview_length': 200,

@@ -17,6 +17,7 @@ from kv.services.pdf_export import html_exporter
 from kv.services.config_service import config_service
 from kv.services.export_manager import export_manager
 from kv.services.backup_service import backup_service
+from kv.services.auto_export import auto_export_service
 from kv.algorithms.dedup import dedup
 
 
@@ -33,7 +34,8 @@ def cli():
 @click.option("--author", "-a", help="作者")
 @click.option("--collection", "-c", help="合集名称")
 @click.option("--no-dedup", is_flag=True, help="跳过重复检测")
-def add(url: str, title: Optional[str], author: Optional[str], collection: Optional[str], no_dedup: bool):
+@click.option("--no-export", is_flag=True, help="跳过自动导出")
+def add(url: str, title: Optional[str], author: Optional[str], collection: Optional[str], no_dedup: bool, no_export: bool):
     """添加网页到知识库
 
     示例：
@@ -116,6 +118,36 @@ def add(url: str, title: Optional[str], author: Optional[str], collection: Optio
         click.echo(f"  ID: {item.id}")
         click.echo(f"  字数: {content.word_count}")
         click.echo(f"  阅读时间: {content.reading_time} 分钟")
+
+        # Auto-export (failure should not affect adding operation)
+        if not no_export and auto_export_service.should_export():
+            try:
+                with click.progressbar(length=100, label="正在导出") as bar:
+                    bar.update(50)
+
+                    results = auto_export_service.export_item(item)
+
+                    bar.update(100)
+
+                    # Display export results
+                    exported_files = []
+                    for fmt in ["html", "pdf"]:
+                        if fmt in results and results[fmt]:
+                            exported_files.append(fmt)
+
+                    if exported_files:
+                        click.echo(f"\n[导出] 已自动导出: {', '.join(exported_files).upper()}")
+                        for fmt in exported_files:
+                            file_path = Path(results[fmt])
+                            rel_path = export_manager.get_relative_path(file_path)
+                            click.echo(f"  - {rel_path}")
+
+                    if "error" in results:
+                        click.echo(f"\n[警告] 部分导出失败: {results['error']}", err=True)
+
+            except Exception as e:
+                # Export failure should not affect adding operation
+                auto_export_service.handle_export_error(e, item.title)
 
     except Exception as e:
         click.echo(f"错误: {e}", err=True)
