@@ -67,6 +67,11 @@ KnowIt 的设计灵感来源于以下优秀项目：
   - 合集系统：层级化组织，结构清晰
   - 状态管理：inbox、archived、starred、merged
 
+- **自动导出**
+  - 添加知识后自动生成 HTML 和 PDF
+  - 按合集自动组织文件结构
+  - 类似 Obsidian 的知识管理体验
+
 - **精美导出**
   - Kami 设计系统：专业排版
   - HTML/PDF 双格式支持
@@ -77,6 +82,10 @@ KnowIt 的设计灵感来源于以下优秀项目：
   - 自动备份功能
   - 一键恢复数据
   - 本地 SQLite 数据库
+
+- **测试覆盖**
+  - 17+ 单元测试覆盖核心功能
+  - 持续集成质量保障
 
 ## 快速开始
 
@@ -112,8 +121,11 @@ python scripts/init_db.py
 ### 基础使用
 
 ```bash
-# 添加网页
+# 添加网页（自动导出 HTML 和 PDF）
 kv add https://example.com/article
+
+# 添加到指定合集
+kv add https://example.com/article -c "Python 学习"
 
 # 搜索内容
 kv search "关键词"
@@ -314,9 +326,66 @@ kv collection add <item_id> "技术学习"
 kv collection remove <item_id> "技术学习"
 ```
 
+### 自动导出
+
+KnowIt 支持在添加知识后自动导出，类似 Obsidian 的知识管理体验。
+
+```bash
+# 自动导出在添加知识后自动触发
+kv add https://example.com/article
+# 输出：[导出] 已自动导出: HTML, PDF
+#       - by-collection/Inbox/文章标题.html
+#       - by-collection/Inbox/文章标题.pdf
+
+# 添加到合集时自动组织
+kv add https://example.com/article -c "Python 学习"
+# 输出：[导出] 已自动导出: HTML, PDF
+#       - by-collection/Python学习/文章标题.html
+#       - by-collection/Python学习/文章标题.pdf
+
+# 临时跳过自动导出
+kv add https://example.com/article --no-export
+```
+
+#### 自动导出配置
+
+```bash
+# 查看自动导出配置
+kv config get auto_export
+
+# 禁用自动导出
+kv config set auto_export.enabled false
+
+# 只导出 HTML
+kv config set auto_export.formats '["html"]'
+
+# 按日期组织
+kv config set auto_export.organize_by date
+
+# 使用简化格式（无封面页）
+kv config set auto_export.use_kami false
+```
+
+#### 自动导出目录结构
+
+```
+~/KnowIt/exports/
+├── by-collection/
+│   ├── Python学习/
+│   │   ├── 2024-01-15_装饰器详解.html
+│   │   └── 2024-01-15_装饰器详解.pdf
+│   ├── 前端开发/
+│   │   └── CSS_Grid布局指南.html
+│   └── Inbox/                    # 未分类文章
+│       └── 随笔一则.html
+```
+
 ### 导出管理
 
 ```bash
+# 手动导出单个条目
+kv export <item_id>
+
 # 列出导出文件
 kv exports list
 
@@ -379,15 +448,40 @@ kv stats
 # 去重设置
 dedup:
   threshold: 0.75  # 相似度阈值（0-1）
+  enabled: true    # 是否启用去重
 
-# 导出设置
+# 自动导出设置 ⭐
+auto_export:
+  enabled: true                    # 是否启用自动导出
+  directory: null                  # 自定义导出目录（null = 默认）
+  formats:                          # 导出格式列表
+    - html
+    - pdf
+  clean_html: true                 # 是否清理 HTML
+  use_kami: true                   # 是否使用 Kami 完整格式
+  organize_by: collection           # 组织方式：date | collection | none
+  on_error: warn                   # 错误处理：warn | ignore
+
+# 手动导出设置
 export:
-  organize_by: date  # 导出目录组织方式：date | collection | none
-  default_format: html  # 默认导出格式
+  default_format: html             # 默认导出格式
+  open_in_browser: false           # 是否在浏览器中打开
+  organize_by: date                # 导出目录组织方式
 
 # 抓取设置
 scraper:
-  timeout: 30  # 请求超时时间（秒）
+  timeout: 30                      # 请求超时时间（秒）
+  user_agent: 'Mozilla/5.0...'     # 用户代理
+
+# 搜索设置
+search:
+  limit: 20                        # 搜索结果数量
+  preview_length: 200              # 预览长度
+
+# 显示设置
+display:
+  date_format: '%Y-%m-%d %H:%M'    # 日期格式
+  max_preview_length: 500         # 最大预览长度
 ```
 
 ## 导出格式
@@ -453,7 +547,9 @@ pip install weasyprint
 knowit/
 ├── src/kv/
 │   ├── __init__.py
-│   ├── cli.py              # CLI 入口（2000+ 行）
+│   ├── cli.py              # CLI 入口
+│   ├── commands/           # CLI 命令模块（规划中）
+│   │   └── __init__.py
 │   ├── core/
 │   │   ├── __init__.py
 │   │   ├── config.py       # 配置管理
@@ -468,18 +564,28 @@ knowit/
 │   │   ├── backup_service.py    # 备份服务
 │   │   ├── export_manager.py    # 导出管理
 │   │   ├── config_service.py    # 配置服务
+│   │   ├── auto_export.py       # 自动导出服务 ⭐
 │   │   └── playwright_scraper.py # 动态内容抓取
 │   ├── algorithms/
 │   │   ├── __init__.py
 │   │   └── dedup.py        # 去重算法
 │   └── utils/              # 工具函数
+├── tests/                  # 测试套件 ⭐
+│   ├── __init__.py
+│   ├── conftest.py
+│   ├── test_auto_export.py
+│   ├── test_dedup.py
+│   └── test_database_service.py
 ├── scripts/                # 脚本工具
 │   ├── init_db.py         # 初始化数据库
-│   ├── test_setup.py      # 测试环境
-│   └── ...
-├── tests/                  # 测试
+│   └── test_setup.py      # 测试环境
 ├── docs/                   # 文档
+├── config/                 # 配置目录 ⭐
+│   └── README.md
+├── data/                   # 数据目录 ⭐
+│   └── README.md
 ├── pyproject.toml         # 项目配置
+├── pytest.ini             # Pytest 配置 ⭐
 ├── requirements.txt        # 依赖列表
 └── README.md              # 本文件
 ```
@@ -528,10 +634,15 @@ mypy src/
 pytest tests/
 
 # 特定测试
-pytest tests/test_database.py
+pytest tests/test_dedup.py
+
+# 带详细输出
+pytest tests/ -v
 
 # 带覆盖率
 pytest --cov=kv tests/
+
+# 当前测试覆盖：17 个测试全部通过 ✅
 ```
 
 ## 设计系统
@@ -624,6 +735,7 @@ KnowIt 的实现得益于以下优秀的开源项目：
 - **[simhash](https://github.com/seomoz/simhash-py)** - 相似度检测算法
 - **[jieba](https://github.com/fxsjy/jieba)** - 中文分词
 - **[WeasyPrint](https://weasyprint.org/)** - HTML 到 PDF 转换
+- **[Pytest](https://docs.pytest.org/)** - 测试框架
 
 ### 特别感谢
 
