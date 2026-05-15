@@ -4,6 +4,7 @@ import pytest
 from datetime import datetime
 
 from kv.services.database import DatabaseService
+from kv.core.database import Item, Collection, Tag
 from kv.core.exceptions import (
     ItemNotFoundError,
     DuplicateItemError,
@@ -62,8 +63,11 @@ class TestDatabaseServiceItems:
     def test_get_items_with_filters(self, temp_db):
         """Test retrieving items with filters"""
         # Create items with different statuses
-        temp_db.create_item(title="Inbox Item", source_type="webpage", status="inbox")
-        temp_db.create_item(title="Archived Item", source_type="webpage", status="archived")
+        item1 = temp_db.create_item(title="Inbox Item", source_type="webpage")
+        temp_db.update_item(item1.id, status="inbox")
+
+        item2 = temp_db.create_item(title="Archived Item", source_type="webpage")
+        temp_db.update_item(item2.id, status="archived")
 
         inbox_items = temp_db.get_items(status="inbox")
         archived_items = temp_db.get_items(status="archived")

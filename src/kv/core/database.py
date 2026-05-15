@@ -1,10 +1,15 @@
 """数据库模型"""
 
 from sqlalchemy import Column, String, Integer, Text, Float, DateTime, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from datetime import datetime
+from sqlalchemy.orm import declarative_base
+from datetime import datetime, timezone
 
 Base = declarative_base()
+
+# Helper function for UTC timestamps
+def utcnow():
+    """Get current UTC datetime"""
+    return datetime.now(timezone.utc)
 
 
 class Item(Base):
@@ -26,8 +31,8 @@ class Item(Base):
     status = Column(String, default="inbox")  # 'inbox', 'archived', 'starred', 'merged'
     merged_into = Column(String, ForeignKey("items.id"))
     simhash = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
 
 class Collection(Base):
@@ -40,8 +45,8 @@ class Collection(Base):
     description = Column(Text)
     parent_id = Column(String, ForeignKey("collections.id"))
     item_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow)
 
 
 class Tag(Base):
@@ -53,7 +58,7 @@ class Tag(Base):
     name = Column(String, unique=True, nullable=False)
     color = Column(String, default="#1B365D")
     use_count = Column(Integer, default=0)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=utcnow)
 
 
 class ItemTag(Base):
@@ -75,4 +80,4 @@ class ItemSimilarity(Base):
     item_id_2 = Column(String, ForeignKey("items.id"), nullable=False)
     similarity = Column(Float, nullable=False)
     method = Column(String, nullable=False)  # 'simhash', 'embedding'
-    computed_at = Column(DateTime, default=datetime.utcnow)
+    computed_at = Column(DateTime, default=utcnow)

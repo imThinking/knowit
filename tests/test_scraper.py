@@ -149,21 +149,14 @@ class TestUtilityFunctions:
         # Hash should be hex string
         assert all(c in '0123456789abcdef' for c in hash1)
 
-    @patch('builtins.open', create=True)
-    @patch('kv.services.scraper.BeautifulSoup')
-    def test_scrape_file_success(self, mock_bs, mock_open):
-        """Test file scraping"""
-        # Mock file reading
-        mock_file = Mock()
-        mock_file.read.return_value = "<html></html>"
-        mock_open.return_value.__enter__.return_value = mock_file
+    def test_scrape_file_success(self, tmp_path):
+        """Test file scraping with real file"""
+        # Create a temporary HTML file
+        html_file = tmp_path / "test.html"
+        html_file.write_text("<html><head><title>Test Title</title></head><body><p>Test content here</p></body></html>")
 
-        # Mock BeautifulSoup
-        mock_soup = Mock()
-        mock_soup.find.return_value = None
-        mock_bs.return_value = mock_soup
-
-        result = scrape_file("/fake/path.html")
+        result = scrape_file(str(html_file))
 
         assert isinstance(result, ScrapedContent)
-        assert result.title == "/fake/path.html"  # Fallback when no title tag
+        assert result.title == "Test Title"
+        assert "Test content here" in result.content_text

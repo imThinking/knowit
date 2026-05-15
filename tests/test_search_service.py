@@ -2,17 +2,13 @@
 
 import pytest
 from unittest.mock import Mock, patch, MagicMock
+from datetime import datetime
+
+# Only run these tests if meilisearch is available
+pytest.importorskip("meilisearch", reason="meilisearch not installed")
 
 from kv.services.search_service import MeilisearchService, SearchResult
 from kv.core.database import Item
-from datetime import datetime
-
-
-# Mock meilisearch module
-mock_meilisearch = MagicMock()
-sys = MagicMock()
-sys.modules['meilisearch'] = mock_meilisearch
-sys.modules['meilisearch.errors'] = MagicMock()
 
 
 class TestMeilisearchService:

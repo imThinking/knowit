@@ -5,7 +5,7 @@ collections, tags, and their relationships.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from sqlalchemy import create_engine, and_, or_
 from sqlalchemy.orm import sessionmaker, Session
@@ -118,8 +118,8 @@ class DatabaseService:
                     collection_id=collection_id,
                     simhash=simhash,
                     status="inbox",
-                    created_at=datetime.utcnow(),
-                    updated_at=datetime.utcnow(),
+                    created_at=datetime.now(timezone.utc),
+                    updated_at=datetime.now(timezone.utc),
                 )
                 session.add(item)
                 session.commit()
@@ -191,7 +191,7 @@ class DatabaseService:
                     if hasattr(item, key):
                         setattr(item, key, value)
 
-                item.updated_at = datetime.utcnow()
+                item.updated_at = datetime.now(timezone.utc)
 
                 session.commit()
                 session.refresh(item)
@@ -315,8 +315,8 @@ class DatabaseService:
                     description=description,
                     parent_id=parent_id,
                     item_count=0,
-                    created_at=datetime.utcnow(),
-                    updated_at=datetime.utcnow(),
+                    created_at=datetime.now(timezone.utc),
+                    updated_at=datetime.now(timezone.utc),
                 )
                 session.add(collection)
                 session.commit()
@@ -390,7 +390,7 @@ class DatabaseService:
                     if hasattr(collection, key):
                         setattr(collection, key, value)
 
-                collection.updated_at = datetime.utcnow()
+                collection.updated_at = datetime.now(timezone.utc)
 
                 session.commit()
                 session.refresh(collection)
@@ -697,7 +697,7 @@ class DatabaseService:
                 if existing:
                     existing.similarity = similarity
                     existing.method = method
-                    existing.computed_at = datetime.utcnow()
+                    existing.computed_at = datetime.now(timezone.utc)
                     session.commit()
                     session.refresh(existing)
                     return existing
@@ -707,7 +707,7 @@ class DatabaseService:
                     item_id_2=item_id_2,
                     similarity=similarity,
                     method=method,
-                    computed_at=datetime.utcnow(),
+                    computed_at=datetime.now(timezone.utc),
                 )
                 session.add(similarity_record)
                 session.commit()
