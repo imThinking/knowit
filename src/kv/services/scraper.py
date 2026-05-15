@@ -1,12 +1,23 @@
 """Web scraping service for fetching and parsing web content"""
 
 import re
-from typing import Optional, Dict, Any
+from typing import Optional
 from urllib.parse import urlparse
 import hashlib
 
 from bs4 import BeautifulSoup
 import requests
+from requests.exceptions import RequestException, Timeout as RequestsTimeout
+
+from kv.core.exceptions import (
+    ScrapingError,
+    InvalidURLError,
+    NetworkError,
+    TimeoutError,
+    ContentExtractionError,
+    PlaywrightError,
+    FileReadError,
+)
 
 
 class ScrapedContent:
@@ -30,9 +41,22 @@ class ScrapedContent:
 
 
 class WebScraper:
-    """Web scraper using requests + BeautifulSoup"""
+    """Web scraper using requests + BeautifulSoup
 
-    def __init__(self, timeout: int = 30):
+    Provides methods for fetching and parsing web content,
+    including title extraction, author detection, and content cleaning.
+
+    Attributes:
+        timeout: Request timeout in seconds
+        session: Requests session for connection pooling
+    """
+
+    def __init__(self, timeout: int = 30) -> None:
+        """Initialize the web scraper
+
+        Args:
+            timeout: Request timeout in seconds
+        """
         self.timeout = timeout
         self.session = requests.Session()
         self.session.headers.update(
@@ -42,65 +66,134 @@ class WebScraper:
         )
 
     def fetch(self, url: str) -> ScrapedContent:
-        """Fetch and parse content from a URL"""
+        """Fetch and parse content from a URL
+
+        Args:
+            url: URL to fetch and parse
+
+        Returns:
+            ScrapedContent object containing parsed content
+
+        Raises:
+            InvalidURLError: If URL is malformed
+            TimeoutError: If request times out
+            NetworkError: If network request fails
+            ContentExtractionError: If content cannot be extracted
+        """
+        # Validate URL
+        if not self.validate_url(url):
+            raise InvalidURLError(url, "Malformed URL")
+
         # Check if this is a WeChat article - use Playwright for dynamic content
         if "mp.weixin.qq.com" in url:
-            try:
-                from .playwright_scraper import scrape_wechat_article
-                data = scrape_wechat_article(url)
+            return self._fetch_wechat_article(url)
 
-                # Convert dict to ScrapedContent
-                content_text = self._html_to_text(data["html"])
-                word_count = len(content_text.split()) if content_text else 0
+        # Regular scraping with requests
+        return self._fetch_with_requests(url)
 
-                return ScrapedContent(
-                    title=data["title"],
-                    content_html=data["html"],
-                    content_text=content_text,
-                    author=data["author"],
-                    word_count=word_count,
-                    reading_time=self._calculate_reading_time(word_count),
-                )
-            except Exception as e:
-                # Fallback to regular scraping if Playwright fails
-                print(f"Warning: Playwright scraping failed, falling back to requests: {e}")
+    def _fetch_wechat_article(self, url: str) -> ScrapedContent:
+        """Fetch WeChat article using Playwright
 
-        response = self.session.get(url, timeout=self.timeout)
-        response.raise_for_status()
-        response.encoding = response.apparent_encoding or "utf-8"
+        Args:
+            url: WeChat article URL
 
-        soup = BeautifulSoup(response.text, "lxml")
+        Returns:
+            ScrapedContent object
 
-        # Extract title
-        title = self._extract_title(soup)
+        Raises:
+            PlaywrightError: If Playwright scraping fails
+        """
+        try:
+            from .playwright_scraper import scrape_wechat_article
+            data = scrape_wechat_article(url)
 
-        # Extract author
-        author = self._extract_author(soup)
+            # Convert dict to ScrapedContent
+            content_text = self._html_to_text(data["html"])
+            word_count = len(content_text.split()) if content_text else 0
 
-        # Remove unwanted elements
-        self._cleanup_soup(soup)
+            return ScrapedContent(
+                title=data["title"],
+                content_html=data["html"],
+                content_text=content_text,
+                author=data["author"],
+                word_count=word_count,
+                reading_time=self._calculate_reading_time(word_count),
+            )
+        except Exception as e:
+            # Fallback to regular scraping if Playwright fails
+            raise PlaywrightError(url, str(e))
 
-        # Extract main content
-        content_html = self._extract_content(soup)
+    def _fetch_with_requests(self, url: str) -> ScrapedContent:
+        """Fetch content using requests library
 
-        # Extract text
-        content_text = self._html_to_text(content_html)
+        Args:
+            url: URL to fetch
 
-        # Calculate word count and reading time
-        word_count = len(content_text.split()) if content_text else 0
-        reading_time = self._calculate_reading_time(word_count)
+        Returns:
+            ScrapedContent object
 
-        return ScrapedContent(
-            title=title,
-            content_html=content_html,
-            content_text=content_text,
-            author=author,
-            word_count=word_count,
-            reading_time=reading_time,
-        )
+        Raises:
+            TimeoutError: If request times out
+            NetworkError: If network request fails
+            ContentExtractionError: If content cannot be extracted
+        """
+        try:
+            response = self.session.get(url, timeout=self.timeout)
+            response.raise_for_status()
+            response.encoding = response.apparent_encoding or "utf-8"
+        except RequestsTimeout:
+            raise TimeoutError(url, self.timeout)
+        except RequestException as e:
+            raise NetworkError(url, reason=str(e))
+
+        try:
+            soup = BeautifulSoup(response.text, "lxml")
+
+            # Extract title
+            title = self._extract_title(soup)
+
+            # Extract author
+            author = self._extract_author(soup)
+
+            # Remove unwanted elements
+            self._cleanup_soup(soup)
+
+            # Extract main content
+            content_html = self._extract_content(soup)
+
+            # Extract text
+            content_text = self._html_to_text(content_html)
+
+            # Calculate word count and reading time
+            word_count = len(content_text.split()) if content_text else 0
+            reading_time = self._calculate_reading_time(word_count)
+
+            return ScrapedContent(
+                title=title,
+                content_html=content_html,
+                content_text=content_text,
+                author=author,
+                word_count=word_count,
+                reading_time=reading_time,
+            )
+        except Exception as e:
+            raise ContentExtractionError(url, str(e))
 
     def _extract_title(self, soup: BeautifulSoup) -> str:
-        """Extract the title from the page"""
+        """Extract the title from the page
+
+        Tries multiple sources in order:
+        1. Open Graph title (og:title)
+        2. HTML title tag
+        3. First h1 tag
+        4. Fallback to "Untitled"
+
+        Args:
+            soup: BeautifulSoup object
+
+        Returns:
+            Extracted title
+        """
         # Try og:title first
         og_title = soup.find("meta", property="og:title")
         if og_title and og_title.get("content"):
@@ -119,7 +212,19 @@ class WebScraper:
         return "Untitled"
 
     def _extract_author(self, soup: BeautifulSoup) -> Optional[str]:
-        """Extract author from the page"""
+        """Extract author from the page
+
+        Tries multiple sources:
+        1. Meta author tag
+        2. Open Graph article:author
+        3. Schema.org author span
+
+        Args:
+            soup: BeautifulSoup object
+
+        Returns:
+            Author name or None if not found
+        """
         # Try meta author
         author_meta = soup.find("meta", attrs={"name": "author"})
         if author_meta and author_meta.get("content"):
@@ -137,8 +242,14 @@ class WebScraper:
 
         return None
 
-    def _cleanup_soup(self, soup: BeautifulSoup):
-        """Remove unwanted elements from the page"""
+    def _cleanup_soup(self, soup: BeautifulSoup) -> None:
+        """Remove unwanted elements from the page
+
+        Removes scripts, styles, iframes, and other non-content elements.
+
+        Args:
+            soup: BeautifulSoup object to clean
+        """
         # Elements to remove
         unwanted_tags = [
             "script",
@@ -152,7 +263,19 @@ class WebScraper:
                 element.decompose()
 
     def _extract_content(self, soup: BeautifulSoup) -> str:
-        """Extract the main content from the page"""
+        """Extract the main content from the page
+
+        Tries multiple selectors to find main content:
+        1. <article> tag
+        2. Common content container selectors
+        3. Fallback to <body>
+
+        Args:
+            soup: BeautifulSoup object
+
+        Returns:
+            HTML string of main content
+        """
         # Try to find article tag
         article = soup.find("article")
         if article:
@@ -183,7 +306,16 @@ class WebScraper:
         return ""
 
     def _html_to_text(self, html: str) -> str:
-        """Convert HTML to plain text"""
+        """Convert HTML to plain text
+
+        Extracts text content from HTML while preserving paragraph structure.
+
+        Args:
+            html: HTML string
+
+        Returns:
+            Plain text with preserved structure
+        """
         soup = BeautifulSoup(html, "lxml")
 
         # Replace block elements with newlines
@@ -200,13 +332,28 @@ class WebScraper:
         return text
 
     def _calculate_reading_time(self, word_count: int, wpm: int = 200) -> int:
-        """Calculate reading time in minutes"""
+        """Calculate reading time in minutes
+
+        Args:
+            word_count: Number of words
+            wpm: Reading speed (words per minute)
+
+        Returns:
+            Reading time in minutes (minimum 1)
+        """
         if word_count == 0:
             return 0
         return max(1, round(word_count / wpm))
 
     def validate_url(self, url: str) -> bool:
-        """Validate if a URL is well-formed"""
+        """Validate if a URL is well-formed
+
+        Args:
+            url: URL string to validate
+
+        Returns:
+            True if URL is valid, False otherwise
+        """
         try:
             result = urlparse(url)
             return all([result.scheme, result.netloc])
@@ -215,9 +362,23 @@ class WebScraper:
 
 
 def scrape_file(file_path: str) -> ScrapedContent:
-    """Scrape content from a local file"""
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
+    """Scrape content from a local file
+
+    Args:
+        file_path: Path to the local HTML file
+
+    Returns:
+        ScrapedContent object
+
+    Raises:
+        FileReadError: If file cannot be read
+        ContentExtractionError: If content cannot be extracted
+    """
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()
+    except OSError as e:
+        raise FileReadError(file_path, str(e))
 
     scraper = WebScraper()
     soup = BeautifulSoup(content, "lxml")
@@ -254,13 +415,34 @@ def scrape_file(file_path: str) -> ScrapedContent:
 
 
 def generate_simhash(text: str) -> str:
-    """Generate a simple hash for text (placeholder for simhash library)"""
-    # This is a simplified version - use the simhash library for production
+    """Generate a simple hash for text (placeholder for simhash library)
+
+    Note: This is a simplified version using MD5.
+    Use the simhash library for production deduplication.
+
+    Args:
+        text: Text to hash
+
+    Returns:
+        Hex string hash
+    """
     return hashlib.md5(text.encode("utf-8")).hexdigest()
 
 
-# Convenience function for quick scraping
 def scrape_url(url: str) -> ScrapedContent:
-    """Convenience function to scrape a URL"""
+    """Convenience function to scrape a URL
+
+    Args:
+        url: URL to scrape
+
+    Returns:
+        ScrapedContent object
+
+    Raises:
+        InvalidURLError: If URL is invalid
+        TimeoutError: If request times out
+        NetworkError: If network request fails
+        ContentExtractionError: If content cannot be extracted
+    """
     scraper = WebScraper()
     return scraper.fetch(url)

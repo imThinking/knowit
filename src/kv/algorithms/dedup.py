@@ -1,4 +1,8 @@
-"""Deduplication algorithms using simhash"""
+"""Deduplication algorithms using simhash
+
+This module provides content deduplication functionality using the simhash algorithm.
+It can detect near-duplicate content and suggest or perform merges.
+"""
 
 from typing import List, Tuple, Optional
 from simhash import Simhash
